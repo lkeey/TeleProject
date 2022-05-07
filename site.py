@@ -3,22 +3,22 @@ from flask import Flask, request, render_template
 from datetime import datetime
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')  # still relative to module
 
                 # для json файла
 
-db_file = "Data-base-messages.json"  
+db_file = "Data-Bases\Data_Base.json"  
 # Путь к файлу 
 json_db = open(db_file, "rb")  # Открываем файл 
-data = json.load(json_db)  # Загружаем данные из файла
-messages_list = data["messages_list"]  # Берем сообщения из структуры и кладем в переменную
+data_base = json.load(json_db)  # Загружаем данные из файла
+intents_list = data_base["intents"]  # Берем сообщения из структуры и кладем в переменную
 
 
 # Функция сохранения сообщений в файл
-def save_messages():
+def save_intents():
     # Создаем структуру
     data = {
-        "messages_list": messages_list,
+        "intents": intents_list,
     }
     # Открываем файл на запись
     json_db = open(db_file, "w")
@@ -32,51 +32,51 @@ def print_message(message):
 
 
 # Функция добавления нового сообщения
-def add_message(name, txt):
-    message = {
-        "text": txt,
-        "sender": name,
-        "date": datetime.now().strftime("%H:%M"),
-        # Хочется, чтобы текущая дата подставлялась автоматически
+def add_message(example, response, topic):
+    intents = {
+        topic:{
+            "examples": example,
+            "responses": response,
+        }   
     }
-    messages_list.append(message)  # Добавляем новое сообщение в список
+    intents_list.append(intents) 
+ # Добавляем новое сообщение в список
+    print("intents_list",intents_list)
 
-
-                                        # Функции для браузера
+                                     # Функции для браузера
 # Главная страница
 @app.route("/")
 def index_page():
-    return "Hello, welcome to Social Chat"
+    return "Hello, welcome to TeleWeb"
 
 
 # Раздел со списком сообщений
-@app.route("/get_messages")
+@app.route("/get_intents")
 def get_messages():
-    return {"messages": messages_list}
+    return {"intents": intents_list} 
 
 
 # Раздел для отправки сообщения
-@app.route("/send_message")
-def send_message():
-    name = request.args["name"]
-    text = request.args["text"]
+@app.route("/send_intents")
+def send_intents():
+    example = request.args["examples"]
+    responce = request.args["responses"]
 
-    if len(name) > 100 or len(name) < 2:
+    if len(example) > 100 or len(example) < 2:
         return "ERROR"
 
-    if len(text) > 1000 or len(text) == 0:
+    if len(responce) > 1000 or len(responce) == 0:
         return "ERROR"
 
-    add_message(name, text)
-    save_messages()  # Сохраняем все сообщение в файл
+    add_message(example, responce)
+    save_intents()  # Сохраняем все сообщение в файл
     return "Your message was sent"
 
 
 # Раздел с визуальным интерфейсом
 @app.route("/form")
 def form():
-    return render_template("form.html")
-
+    return render_template("index.html")
 
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=80)
