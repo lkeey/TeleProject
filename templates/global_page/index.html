@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>TeleSite</title>
+    <link rel="stylesheet" href="css_global/style.css">
+
     <!-- Подключение библиотеки jQuery-->
     <script
         src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -63,13 +65,30 @@
     </script>
 </head>
 <body>
-    <!-- Интерфейс: имя, окно чата, текст сообщения -->
-    <b>TYPE </b>
-    <input id="name" type="text" placeholder="Your answer"/>
+    <h1 id="name_site">Tele-Site</h1>
 
-    <div id="chat_window"></div>
+    <div class="form-profile">  
+        <h2>Name </h2>
+        <h3>Points </h3>
+        <h3>Top </h3>
+    </div>
+    
+    <div class="form">
+        <h1>intent</h1>
+        <!-- Интерфейс: имя, окно чата, текст сообщения -->
+        <div class="input-form">
+            <input id="topic" type="topic" placeholder="Topic"/>
+        </div>
 
-    <br/>
-    <input id="text" type="text" placeholder="Your responce">
+        <div class="input-form">
+            <input id="answer" type="text" placeholder="Answer"/>
+        </div>
+
+        <div class="input-form">
+            <input id="responce" type="text" placeholder="Responce">
+        </div>
+
+    </div>
+    
 </body>
 </html>
