@@ -1,11 +1,24 @@
 body {
-	background: linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)), url(images/background_logging.jpg);
 	-webkit-background-size: cover;
 	background-size: cover;
 	background-attachment: fixed;
 	font-family: sans-serif;
 	
+	background-image: url("img/background_logging_image.png"), linear-gradient(#ff6bcb, #459be7);	
 }
+.title {
+	font-family: The Spring
+}
+/* .background {
+	background-size: cover;
+	border-radius: 20px;
+	position: fixed;
+	background-position: 0 0;
+}
+
+.name h1{
+	z-index: 100;
+} */
 
 .form {
 	position: absolute;
