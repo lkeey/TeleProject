@@ -5,6 +5,7 @@ import nltk
 import json
 import logging
 import sklearn
+import telegram
 from telegram import ParseMode
 import telebot
 import logging
@@ -15,9 +16,14 @@ from telegram import Update, ForceReply, KeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from telegram import ParseMode
 
+# Variables
+get_weather = False
+rate_weather = 0
+open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
+
 # открытие словаря
 try:
-    with open("Data_Base.json", "r", encoding="utf-8") as file:
+    with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
         BOT_CONFIG = json.load(file)
 except:
     print("WARNING")
@@ -65,10 +71,53 @@ def bot(text):
     return 'Некорректная форма вопроса!'
 
 def echo(update: Update, context: CallbackContext) -> None:
+    global city, rate_weather
     """Echo the user message."""
-    input_text = update.message.text
-    reply = bot(input_text)
-    update.message.reply_text(reply)
+    if not get_weather:
+        input_text = update.message.text
+        update.message.reply_text(input_text)
+        reply = bot(input_text)
+        update.message.reply_text(reply)
+    else:
+        if rate_weather == 1:
+            city = update.message.text
+            try:
+                data = requests.get((
+                    f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric'
+                )).json()
+
+                # {"coord": {"lon": 37.6156, "lat": 55.7522}, "weather": [{"id": 804, "main": "Clouds", "description": "overcast clouds",
+                #  "icon": "04d"}], "base": "stations", "main": {"temp": 9.57, "feels_like": 6.72, "temp_min": 5.75, "temp_max": 10.35, 
+                #  "pressure": 1020, "humidity": 34, "sea_level": 1020, "grnd_level": 1002}, "visibility": 10000, "wind": {"speed": 5.94,
+                #   "deg": 335, "gust": 6.75}, "clouds": {"all": 95}, "dt": 1652091338, "sys": {"type": 1, "id": 9027, "country": "RU", 
+                #   "sunrise": 1652059798, "sunset": 1652116922}, "timezone": 10800, "id": 524901, "name": "Moscow", "cod": 200}
+
+                city = data['name']
+                cur_weather = data['main']['temp']
+                wind = data['wind']['speed']
+                sunrise_timestamp = datetime.datetime.fromtimestamp(data['sys']['sunrise'])
+                sunset_timestamp = datetime.datetime.fromtimestamp(data['sys']['sunset'])
+                # length_of_day = datetime.datetime.fromtimestamp(data['sys']['sunset']) - datetime.datetime.fromtimestamp(data['sys']['sunrise'])
+                length_of_day = sunset_timestamp - sunrise_timestamp
+                update.message.reply_text('***'+str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))+'***')
+                update.message.reply_text('Погода в городе: '+str(city)+'\nТемпература: '+str(cur_weather)+'°C\nСкорость ветра: '+str(wind)+'м\с')
+                update.message.reply_text('Восход солнца: '+str(sunrise_timestamp)+'\nЗакат солнца: '+str(sunset_timestamp)+'\nПродолжительность дня: '+str(length_of_day))
+                update.message.reply_text('Одевайся по погоде!)')              
+
+            except Exception as ex:
+                update.message.reply_text(data)   
+                update.message.reply_text(str(ex))
+
+            rate_weather = 0
+            
+
+def weather(update: Update, context: CallbackContext) -> None:
+    global get_weather, rate_weather
+    rate_weather = 1
+    get_weather = True
+
+    if rate_weather == 1:
+        update.message.reply_text("Write City:")
 
 # Главная функция
 def main() -> None:
@@ -85,6 +134,7 @@ def main() -> None:
   
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("weather", weather))
 
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text, echo))

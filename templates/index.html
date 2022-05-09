@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>TeleSite</title>
-    <link rel="stylesheet" href="css_global/style.css">
 
     <!-- Подключение библиотеки jQuery-->
     <script
@@ -59,58 +58,18 @@
 
            // Каждую секунду вызывать loadIntents
            setInterval(loadIntents, 1000);
-
         });
 
     </script>
 </head>
-<body> 
-    <img src="img/background.jpg" class="background" />
-    
-    <div class="name">
-        <h1 id="name_site">Future Forest</h1> 
-    </div>
-    
+<body>
+    <!-- Интерфейс: имя, окно чата, текст сообщения -->
+    <b>TYPE </b>
+    <input id="name" type="text" placeholder="Your answer"/>
 
-    <div class="form-profile"> 
-        <h2>Name...</h2>
-        <h3>Points...</h3>
-        <h3>Top Place...</h3>
-    </div>
-    
-    <div class="form">
-        <h1>intent</h1>
-        <!-- Интерфейс: имя, окно чата, текст сообщения -->
-        <div class="input-form">
-            <input id="topic" type="text" placeholder="Topic"/>
-        </div>
+    <div id="chat_window"></div>
 
-        <div class="input-form">
-            <input id="answer" type="text" placeholder="Answer"/>
-        </div>
-
-        <div class="input-form">
-            <input id="responce" type="text" placeholder="Responce">
-        </div>
-
-        <div class="input-form">
-			<input type="submit" value="Send">
-		</div>
-
-    </div>
-
-    <div class="top">
-        <h1>TOP</h1>
-        <div>
-            1.
-        </div>
-        <div>
-            2.
-        </div>
-        <div>
-            3.
-        </div>
-    </div>
-    
+    <br/>
+    <input id="text" type="text" placeholder="Your responce">
 </body>
 </html>

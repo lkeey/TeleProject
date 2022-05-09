@@ -1,9 +1,39 @@
 body {
-	background: linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)), url(images/background.jpg);
 	-webkit-background-size: cover;
 	background-size: cover;
 	background-attachment: fixed;
 	font-family: sans-serif;
+}
+
+img.background {
+	min-height: 100%;
+	min-width: 640px;
+	width: 100%;
+	height: auto;
+	position: fixed;
+	top: 0;
+	left: 0;
+  
+	/* Зависит от размера изображения */
+	@media screen and (max-width: 640px){
+	  img.bg {
+		left: 50%;
+		margin-left: -320px;
+	  }
+	}
+  }
+
+.name {
+	padding: 10px;
+	width: 99%;
+	color: #fff;
+	font-size: 20px;
+	background: none;
+	outline: none;
+	border-radius: 20px;
+	border: 1px solid #fff;
+	box-sizing: border-box;
+	position: absolute;
 }
 
 .form {
@@ -13,6 +43,7 @@ body {
 	transform: translate(-50%,-50%);
 	background: rgba(0,0,0,.7);
 	border-radius: 20px;
+	
 }
 
 .form h1 {
@@ -60,14 +91,31 @@ body {
 	border-radius: 20px;
 }
 
+.top {
+	padding: 10px;
+	width: 40%;
+	color: #fff;
+	font-size: 20px;
+	background: none;
+	outline: none;
+	border-radius: 20px;
+	border: 1px solid #fff;
+	box-sizing: border-box;
+	position: absolute;
+	top: 60%;
+	left: 2%;
+}
 
 .form-profile {
 	position: absolute;
-	top: 25%;
+	top:40%;
 	left: 15%;
 	transform: translate(-50%,-50%);
 	background: rgba(0,0,0,.7);
+
 	border-radius: 20px;
+	border: 1px solid #fff;
+
 }
 
 .form-profile h2,h3 {
@@ -75,4 +123,5 @@ body {
 	text-align: center;
 	color: #fff;
 	font-size: 30px;
+	
 }
