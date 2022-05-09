@@ -1,3 +1,4 @@
+import json
 
 def test():
     counter = 0
@@ -25,7 +26,7 @@ def test_2():
     new_file = new_file.convert("L")
     new_file.show() 
 
-import json
+
 def test_3():
     weather = {
         "London": "25 degree",
@@ -58,7 +59,27 @@ def test_4():
 
     for surname in list_I:
         print(surname)
-test_4()
+
+def test_5():
+    # Mops
+    all_smiles = ["CAACAgIAAxkBAAIBg2J5e_A3Qyvvbx5mJq7zzyC4fsdXAAILAAOc_jIw9y0wzeHFaC0kBA"]
 
 
+    with open('Data-Bases/Data-Smiles.json', 'w', encoding='utf-8') as file:
+        data = {
+            "all_smiles": all_smiles
+        }
+        json.dump(data, file, sort_keys = True)
 
+
+def test_6():
+    smile_1st = "cAAVK_mSpW_9hfOrH4cTWckQ"
+    smile_2nd = "p_csFbW_3MgAABA5JOLqR-Pg"
+    print(len(smile_1st))
+    smile_3rd = "CAACAgIAAxkBAAIBUmJ5eJCiqOh0O8UL-puFfhUxtxfLAAKWDAACC1sZSkTJo0Tt48bJJAQ"
+    count = 0
+    for i in range(len(smile_1st)):
+        if smile_1st[i] != smile_2nd[i]:
+            count += 1
+    print(count)
+    print(smile_1st == smile_2nd)

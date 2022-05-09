@@ -1,25 +1,23 @@
 # найти ошибку, почему сайт не работает !!!
 
-import random
+from random import *
 import nltk
 import json
-import logging
 import sklearn
-import telegram
-from telegram import ParseMode
-import telebot
-import logging
 import datetime
 import requests
-from pprint import pprint
 from telegram import Update, ForceReply, KeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from telegram import ParseMode
+
+with open('Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
+    all_smiles = data["all_smiles"]
 
 # Variables
 get_weather = False
 rate_weather = 0
 open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
+
 
 # открытие словаря
 try:
@@ -64,18 +62,17 @@ def get_intent_by_model(text):
     return clf.predict(vectorizer.transform([text]))[0]
 
 def bot(text):
-  intent = get_intent_by_model(text)
-  if intent != 'intent not found:(':
-    return random.choice(BOT_CONFIG['intents'][intent]['responses'])
-  else:
-    return 'Некорректная форма вопроса!'
+    intent = get_intent_by_model(text)
+    if intent != 'intent not found:(':
+        return choice(BOT_CONFIG['intents'][intent]['responses'])
+    else:
+        return 'Некорректная форма вопроса!'
 
 def echo(update: Update, context: CallbackContext) -> None:
-    global city, rate_weather
+    global city, rate_weather, get_weather
     """Echo the user message."""
     if not get_weather:
         input_text = update.message.text
-        update.message.reply_text(input_text)
         reply = bot(input_text)
         update.message.reply_text(reply)
     else:
@@ -109,6 +106,7 @@ def echo(update: Update, context: CallbackContext) -> None:
                 update.message.reply_text(str(ex))
 
             rate_weather = 0
+            get_weather = False
             
 
 def weather(update: Update, context: CallbackContext) -> None:
@@ -119,6 +117,27 @@ def weather(update: Update, context: CallbackContext) -> None:
     if rate_weather == 1:
         update.message.reply_text("Write City:")
 
+def smile(update: Update, context: CallbackContext) -> None:
+    random_smile = choice(all_smiles)
+    update.message.reply_sticker(random_smile)
+    update.message.reply_text("I have very few stickers (( Send me a couple of your own\nI ve got only "+str(len(all_smiles))+"stick(s)")
+
+
+def new_smile(update: Update, context: CallbackContext) -> None:
+
+    sticker_id = update.message.sticker.file_id
+    
+    all_smiles.append(sticker_id)
+
+    with open('Data-Bases/Data-Smiles.json', 'w', encoding='utf-8') as file:
+        data = {
+            "all_smiles": all_smiles
+        }
+        json.dump(data, file, sort_keys = True)
+
+    update.message.reply_text("Your sticker has already been added...)")
+
+
 # Главная функция
 def main() -> None:
     print("MAIN")
@@ -126,7 +145,7 @@ def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Телеграмм токен
-    updater = Updater("5061820313:AAFPQ26ELLjfYFDJmfHNFEIUG14svbc4Wyw")
+    updater = Updater("5366540233:AAEH04SZyyGE4uD7WvTHiRTXKxCvnQ-uqAM")
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
@@ -135,10 +154,15 @@ def main() -> None:
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("weather", weather))
+    dispatcher.add_handler(CommandHandler("smile", smile))
+    
+    dispatcher.add_handler(MessageHandler(Filters.sticker, new_smile))
 
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     # dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+
+    
 
     # Start the Bot
     updater.start_polling()
