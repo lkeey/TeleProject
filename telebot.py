@@ -1,6 +1,8 @@
 # найти ошибку, почему сайт не работает !!!
 
 from random import *
+import string
+import secrets
 import nltk
 import json
 import sklearn
@@ -17,6 +19,7 @@ with open('Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
 get_weather = False
 rate_weather = 0
 open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
+user = None
 
 
 # открытие словаря
@@ -28,15 +31,80 @@ except:
 
 print("Successfully")
 
+def get_password():
+    # 8 символов
+    all_passwords = list()
+    
+
+    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        data_all_users = json.load(file)
+        data_all_users = data_all_users["users"]
+    for user in data_all_users:
+        all_passwords.append(data_all_users[user]['password'])
+
+    alphabet = string.ascii_letters + string.digits
+    password = ''.join(secrets.choice(alphabet) for i in range(8))
+
+    while password in all_passwords:
+        alphabet = string.ascii_letters + string.digits
+        password = ''.join(secrets.choice(alphabet) for i in range(8))
+    
+    print("PASSWORD", password)
+
+    return password
+
         # Приветствие ( /start )
 def start(update: Update, context: CallbackContext) -> None:
+    global user
+        # Future-Forest, [5/10/2022 3:59 PM]
+        # Hi Лёша Кирюшин!
+
+        # Future-Forest, [5/10/2022 3:59 PM]
+        # [Лёша Кирюшин](tg://user?id=1010205515)\!  
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
         fr'Hi {user.mention_markdown_v2()}\!',
         reply_markup=ForceReply(selective=True),
     )
-    update.message.reply_text(fr'{user.mention_markdown_v2()}\!')
+    update.message.reply_text(fr'{user.mention_markdown_v2()}\!') 
+
+    # update.message.reply_text(str(user))
+    # {'last_name': 'Кирюшин', 'language_code': 'en', 
+    # 'is_bot': False, 'id': 1010205515, 
+    # 'username': 'l_keey', 
+    # 'first_name': 'Лёша'}
+
+    password = get_password() 
+    print("password", password)
+
+    # Данного пользователя
+    data_user = {
+        'last_name': user["last_name"], 
+        'language_code': user["language_code"], 
+        'id': str(user["id"]), 
+        'username': user["username"], 
+        'first_name': user["first_name"],
+        'password': password,
+        }
+    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        data_all_users = json.load(file)
+        data_all_users = data_all_users["users"]
+    # если не зареган
+    if data_user["id"] not in data_all_users:
+        data_all_users[data_user["id"]] = data_user
+        try:
+            with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+                data = {
+                        "users": data_all_users
+                        }
+                json.dump(data, file, sort_keys = True)
+        except:
+            update.message.reply_text("Произошла ошибка :(")
+
+        update.message.reply_text("Вы были успешно зарегистрированы!")
+    else:
+        update.message.reply_text("С возвращением)\nВижу, вы уже были здесь зарегистрированы!")
 
         # Остальные сообщения
 corpus = []
@@ -108,7 +176,6 @@ def echo(update: Update, context: CallbackContext) -> None:
             rate_weather = 0
             get_weather = False
             
-
 def weather(update: Update, context: CallbackContext) -> None:
     global get_weather, rate_weather
     rate_weather = 1
@@ -120,7 +187,7 @@ def weather(update: Update, context: CallbackContext) -> None:
 def smile(update: Update, context: CallbackContext) -> None:
     random_smile = choice(all_smiles)
     update.message.reply_sticker(random_smile)
-    update.message.reply_text("I have very few stickers (( Send me a couple of your own\nI ve got only "+str(len(all_smiles))+"stick(s)")
+    update.message.reply_text("I have very few stickers (( Send me a couple of your own\nI ve got only "+str(len(all_smiles))+" stick(s)")
 
 
 def new_smile(update: Update, context: CallbackContext) -> None:
@@ -136,6 +203,26 @@ def new_smile(update: Update, context: CallbackContext) -> None:
         json.dump(data, file, sort_keys = True)
 
     update.message.reply_text("Your sticker has already been added...)")
+
+def print_bio(update: Update, context: CallbackContext) -> None:
+    global user
+
+    try:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            data_all_users = json.load(file)
+            user_data = data_all_users["users"]
+            user_data = user_data[str(user["id"])]
+
+    except:
+        update.message.reply_text("Warninng in BIO")
+
+    update.message.reply_text("*** BIO ***")
+    update.message.reply_text("Имя: "+str(user_data["first_name"]))
+    update.message.reply_text("Фамилия: "+str(user_data["last_name"]))
+    update.message.reply_text("Предпочтительный язык: "+str(user_data["language_code"]))
+    update.message.reply_text("ID: "+str(user_data["id"]))
+    update.message.reply_text("Login: "+str(user_data["username"]))
+    update.message.reply_text("Password: "+str(user_data["password"]))
 
 
 # Главная функция
@@ -155,6 +242,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("weather", weather))
     dispatcher.add_handler(CommandHandler("smile", smile))
+    dispatcher.add_handler(CommandHandler("bio", print_bio))
     
     dispatcher.add_handler(MessageHandler(Filters.sticker, new_smile))
 

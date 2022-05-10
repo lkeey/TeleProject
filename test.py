@@ -83,3 +83,67 @@ def test_6():
             count += 1
     print(count)
     print(smile_1st == smile_2nd)
+
+
+
+user = {'last_name': 'Кирюшин', 'language_code': 'en', 
+        'is_bot': False, 'id': str(56), 
+        'username': 'l_keey', 
+        'first_name': 'Лёша'
+        }
+
+data_user = {
+        'last_name': user["last_name"], 
+        'language_code': user["language_code"], 
+        'id': user["id"], 
+        'username': user["username"], 
+        'first_name': user["first_name"],
+        'password': 'ooXtBOKL'
+        }
+
+def test_6():
+    # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+    #     data_all_users = json.load(file)
+    #     data_all_users = data_all_users["users"]
+    #     print("data_all_users", data_all_users)
+    
+    data_all_users = {}
+
+    if data_user["id"] not in data_all_users:
+        data_all_users[data_user["id"]] = data_user
+    else:
+        print("Уже есть")
+
+    with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+        data = {
+                "users": data_all_users
+                }
+        json.dump(data, file, sort_keys = True)
+
+        print(data)
+
+    print(len(data))
+    # {"users": {"1010205515": {"first_name": "\u041b\u0451\u0448\u0430", "id": "1010205515", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "1580133018": {"first_name": "Daria", "id": "1580133018", "language_code": "ru", "last_name": null, "username": null}, "56": {"first_name": "\u041b\u0451\u0448\u0430", "id": "56", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "952492649": {"first_name": "TT:", "id": "952492649", "language_code": "ru", "last_name": "hopelesdeath", "username": "LoveYouW0W"}}}
+test_6()
+
+def test_7():
+    data_all_users = {'1010205515': {'first_name': 'Лёша', 'id': '1010205515', 'language_code': 'en', 'last_name': 'Кирюшин', 'username': 'l_keey'}, '1580133018': {'first_name': 'Daria', 'id': '1580133018', 'language_code': 'ru', 'last_name': None, 'username': None}, '56': 
+    {'first_name': 'Лёша', 'id': '56', 'language_code': 'en', 'last_name': 'Кирюшин', 'username': 'l_keey'}, '952492649': {'first_name': 'TT:', 'id': '952492649', 'language_code': 'ru', 'last_name': 'hopelesdeath', 'username': 'LoveYouW0W'}}
+    # добавить время, когда залогинился
+    for user in data_all_users:
+        print(data_all_users[user]["first_name"])
+      
+def test_8():
+    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            data_all_users = json.load(file)
+            user_data = data_all_users["users"]
+            user_data = user_data[user["id"]]
+            print(user_data)
+
+import string
+import secrets
+
+def test_9():
+    alphabet = string.ascii_letters + string.digits
+    password = ''.join(secrets.choice(alphabet) for i in range(8))
+    print(password)

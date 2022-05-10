@@ -49,12 +49,10 @@ def add_message(example, response, topic):
 def index_page():
     return "Hello, welcome to TeleWeb"
 
-
 # Раздел со списком сообщений
 @app.route("/get_intents")
 def get_messages():
     return {"intents": intents_list} 
-
 
 # Раздел для отправки сообщения
 @app.route("/send_intents")
@@ -72,11 +70,14 @@ def send_intents():
     save_intents()  # Сохраняем все сообщение в файл
     return "Your message was sent"
 
-
 # Раздел с визуальным интерфейсом
 @app.route("/form")
 def form():
-    return render_template("index.html")
+    return render_template("global_page/index.html")
+
+@app.route("/login")
+def login():
+    return render_template("log_in/index.html")
 
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=80)
