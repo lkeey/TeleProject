@@ -1,17 +1,18 @@
-# найти ошибку, почему сайт не работает !!!
+# показывать дату регистрации
 
 from random import *
+from time import *
+from datetime import datetime
 import string
 import secrets
 import nltk
 import json
 import sklearn
-import datetime
 import requests
 from telegram import Update, ForceReply, KeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-with open('Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
+with open('Technology/Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
     all_smiles = data["all_smiles"]
 
@@ -24,7 +25,7 @@ user = None
 
 # открытие словаря
 try:
-    with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
+    with open("Technology/Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
         BOT_CONFIG = json.load(file)
 except:
     print("WARNING")
@@ -36,7 +37,7 @@ def get_password():
     all_passwords = list()
     
 
-    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+    with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
         data_all_users = json.load(file)
         data_all_users = data_all_users["users"]
     for user in data_all_users:
@@ -55,7 +56,6 @@ def get_password():
 
         # Приветствие ( /start )
 def start(update: Update, context: CallbackContext) -> None:
-    global user
         # Future-Forest, [5/10/2022 3:59 PM]
         # Hi Лёша Кирюшин!
 
@@ -86,21 +86,28 @@ def start(update: Update, context: CallbackContext) -> None:
         'username': user["username"], 
         'first_name': user["first_name"],
         'password': password,
+        'points': 0,
+        'registered': str(datetime.now().strftime("%D %H:%M:%C"))
         }
-    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-        data_all_users = json.load(file)
-        data_all_users = data_all_users["users"]
+
+    try:
+        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            data_all_users = json.load(file)
+            data_all_users = data_all_users["users"]
+    except:
+        update.message.reply_text("Warning in open BASE-DATA")
+
     # если не зареган
-    if data_user["id"] not in data_all_users:
+    if not (data_user["id"] in data_all_users):
         data_all_users[data_user["id"]] = data_user
         try:
-            with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+            with open('Technology/Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
                 data = {
                         "users": data_all_users
                         }
                 json.dump(data, file, sort_keys = True)
         except:
-            update.message.reply_text("Произошла ошибка :(")
+            update.message.reply_text("Warning in open data-user")
 
         update.message.reply_text("Вы были успешно зарегистрированы!")
     else:
@@ -160,16 +167,17 @@ def echo(update: Update, context: CallbackContext) -> None:
                 city = data['name']
                 cur_weather = data['main']['temp']
                 wind = data['wind']['speed']
-                sunrise_timestamp = datetime.datetime.fromtimestamp(data['sys']['sunrise'])
-                sunset_timestamp = datetime.datetime.fromtimestamp(data['sys']['sunset'])
-                # length_of_day = datetime.datetime.fromtimestamp(data['sys']['sunset']) - datetime.datetime.fromtimestamp(data['sys']['sunrise'])
+                sunrise_timestamp = datetime.fromtimestamp(data['sys']['sunrise'])
+                sunset_timestamp = datetime.fromtimestamp(data['sys']['sunset'])
+                # length_of_day = datetime.fromtimestamp(data['sys']['sunset']) - datetime.datetime.fromtimestamp(data['sys']['sunrise'])
                 length_of_day = sunset_timestamp - sunrise_timestamp
-                update.message.reply_text('***'+str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))+'***')
+                update.message.reply_text('***'+str(datetime.now().strftime('%Y-%m-%d %H:%M'))+'***')
                 update.message.reply_text('Погода в городе: '+str(city)+'\nТемпература: '+str(cur_weather)+'°C\nСкорость ветра: '+str(wind)+'м\с')
                 update.message.reply_text('Восход солнца: '+str(sunrise_timestamp)+'\nЗакат солнца: '+str(sunset_timestamp)+'\nПродолжительность дня: '+str(length_of_day))
                 update.message.reply_text('Одевайся по погоде!)')              
 
             except Exception as ex:
+                update.message.reply_text("Warning in GET_WEATHER")
                 update.message.reply_text(data)   
                 update.message.reply_text(str(ex))
 
@@ -187,8 +195,7 @@ def weather(update: Update, context: CallbackContext) -> None:
 def smile(update: Update, context: CallbackContext) -> None:
     random_smile = choice(all_smiles)
     update.message.reply_sticker(random_smile)
-    update.message.reply_text("I have very few stickers (( Send me a couple of your own\nI ve got only "+str(len(all_smiles))+" stick(s)")
-
+    update.message.reply_text("у меня очень мало стикеров(( Пришли мне пару своих..)\nУ меня лишь "+str(len(all_smiles))+" стикера(-ов)")
 
 def new_smile(update: Update, context: CallbackContext) -> None:
 
@@ -196,19 +203,19 @@ def new_smile(update: Update, context: CallbackContext) -> None:
     
     all_smiles.append(sticker_id)
 
-    with open('Data-Bases/Data-Smiles.json', 'w', encoding='utf-8') as file:
+    with open('Technology/Data-Bases/Data-Smiles.json', 'w', encoding='utf-8') as file:
         data = {
             "all_smiles": all_smiles
         }
         json.dump(data, file, sort_keys = True)
 
-    update.message.reply_text("Your sticker has already been added...)")
+    update.message.reply_text("Твой стик был успешно добавлен...)")
 
 def print_bio(update: Update, context: CallbackContext) -> None:
-    global user
-
+    user = update.effective_user
+    
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             user_data = data_all_users["users"]
             user_data = user_data[str(user["id"])]
@@ -223,7 +230,11 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("ID: "+str(user_data["id"]))
     update.message.reply_text("Login: "+str(user_data["username"]))
     update.message.reply_text("Password: "+str(user_data["password"]))
+    update.message.reply_text("Was registered: "+str(user_data["registered"]))
+    update.message.reply_text("Intents: "+str(user_data["points"]))
 
+    update.message.reply_text("Чтобы заработать Intent-ы переходи сюда:(url...)")
+    
 
 # Главная функция
 def main() -> None:

@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 def test():
     counter = 0
@@ -95,10 +96,12 @@ user = {'last_name': 'Кирюшин', 'language_code': 'en',
 data_user = {
         'last_name': user["last_name"], 
         'language_code': user["language_code"], 
-        'id': user["id"], 
+        'id': str(user["id"]), 
         'username': user["username"], 
         'first_name': user["first_name"],
-        'password': 'ooXtBOKL'
+        'password': "ooXtBOKL",
+        'points': 0,
+        'registered': datetime.now().strftime("%D %H:%M:%C")
         }
 
 def test_6():
@@ -114,7 +117,7 @@ def test_6():
     else:
         print("Уже есть")
 
-    with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+    with open('Technology/Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
         data = {
                 "users": data_all_users
                 }
@@ -124,6 +127,7 @@ def test_6():
 
     print(len(data))
     # {"users": {"1010205515": {"first_name": "\u041b\u0451\u0448\u0430", "id": "1010205515", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "1580133018": {"first_name": "Daria", "id": "1580133018", "language_code": "ru", "last_name": null, "username": null}, "56": {"first_name": "\u041b\u0451\u0448\u0430", "id": "56", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "952492649": {"first_name": "TT:", "id": "952492649", "language_code": "ru", "last_name": "hopelesdeath", "username": "LoveYouW0W"}}}
+
 test_6()
 
 def test_7():
@@ -147,3 +151,10 @@ def test_9():
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(8))
     print(password)
+
+
+def test_10():
+    print(datetime.now().strftime("%D %H:%M:%C"))
+
+
+
