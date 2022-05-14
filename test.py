@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def test():
     counter = 0
@@ -99,17 +99,28 @@ data_user = {
         'id': str(user["id"]), 
         'username': user["username"], 
         'first_name': user["first_name"],
-        'password': "ooXtBOKL",
+        'password': "ygh$!78",
         'points': 0,
-        'registered': datetime.now().strftime("%D %H:%M:%C")
+        'registered': str(datetime.now().strftime("%D %H:%M:%C")),
+
+        # Для внутренних процессов
+        "main": "online",
+        "get_weather": False,
+        "rate_weather": 0,
+        "city": "DEFAULT",
+        "was_online": str(datetime.now())
         }
 
+
 def test_6():
-    # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+    # with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
     #     data_all_users = json.load(file)
     #     data_all_users = data_all_users["users"]
     #     print("data_all_users", data_all_users)
-    
+    #     print("data_all_users 2",data_all_users["users"])
+    #     print("data_all_users 3",data_all_users["users"][str(user["id"])])
+    #     data_all_users["users"][str(user["id"])]["was_online"] = str(datetime.now())
+
     data_all_users = {}
 
     if data_user["id"] not in data_all_users:
@@ -127,8 +138,6 @@ def test_6():
 
     print(len(data))
     # {"users": {"1010205515": {"first_name": "\u041b\u0451\u0448\u0430", "id": "1010205515", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "1580133018": {"first_name": "Daria", "id": "1580133018", "language_code": "ru", "last_name": null, "username": null}, "56": {"first_name": "\u041b\u0451\u0448\u0430", "id": "56", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "952492649": {"first_name": "TT:", "id": "952492649", "language_code": "ru", "last_name": "hopelesdeath", "username": "LoveYouW0W"}}}
-
-test_6()
 
 def test_7():
     data_all_users = {'1010205515': {'first_name': 'Лёша', 'id': '1010205515', 'language_code': 'en', 'last_name': 'Кирюшин', 'username': 'l_keey'}, '1580133018': {'first_name': 'Daria', 'id': '1580133018', 'language_code': 'ru', 'last_name': None, 'username': None}, '56': 
@@ -156,5 +165,17 @@ def test_9():
 def test_10():
     print(datetime.now().strftime("%D %H:%M:%C"))
 
+def test_11():
+    data = str(datetime.now())
+    fifteen_minutes = timedelta(minutes=15)
+    if int(data) - fifteen_minutes >= data:
+        print(True)
+    else:
+        print(False)
 
+# test_6()
 
+with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        data_all_users = json.load(file)
+        data_all_users = data_all_users["users"]
+        print("data_all_users", len(data_all_users))
