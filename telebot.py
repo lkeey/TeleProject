@@ -266,6 +266,12 @@ def echo(update: Update, context: CallbackContext) -> None:
                 #   "sunrise": 1652059798, "sunset": 1652116922}, "timezone": 10800, "id": 524901, "name": "Moscow", "cod": 200}
 
                 city = data['name']
+
+                country = data["sys"]["country"]
+                description = data["weather"][0]["main"]
+                visibility = data["visibility"]
+                humidity = data["main"]["humidity"]
+
                 cur_weather = data['main']['temp']
                 wind = data['wind']['speed']
                 sunrise_timestamp = datetime.fromtimestamp(data['sys']['sunrise'])
@@ -273,7 +279,8 @@ def echo(update: Update, context: CallbackContext) -> None:
                 # length_of_day = datetime.fromtimestamp(data['sys']['sunset']) - datetime.datetime.fromtimestamp(data['sys']['sunrise'])
                 length_of_day = sunset_timestamp - sunrise_timestamp
                 update.message.reply_text('***'+str(datetime.now().strftime('%Y-%m-%d %H:%M'))+'***')
-                update.message.reply_text('Погода в городе: '+str(city)+'\nТемпература: '+str(cur_weather)+'°C\nСкорость ветра: '+str(wind)+'м\с')
+                update.message.reply_text('Погода в городе: '+str(city)+', '+str(country)+'\nТемпература: '+str(cur_weather)+'°C\nСкорость ветра: '+str(wind)+'м\с')
+                update.message.reply_text("Описание: "+str(description)+'\nВидимость: '+str(visibility)+'\nВлажность: '+str(humidity))
                 update.message.reply_text('Восход солнца: '+str(sunrise_timestamp)+'\nЗакат солнца: '+str(sunset_timestamp)+'\nПродолжительность дня: '+str(length_of_day))
                 update.message.reply_text('Одевайся по погоде!)')              
 
@@ -441,4 +448,3 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-    
