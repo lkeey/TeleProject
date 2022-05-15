@@ -108,7 +108,7 @@ data_user = {
         "get_weather": False,
         "rate_weather": 0,
         "city": "DEFAULT",
-        "was_online": str(datetime.now())
+        "was_online": str(datetime.now().strftime("%H:%M"))
         }
 
 
@@ -173,9 +173,29 @@ def test_11():
     else:
         print(False)
 
-# test_6()
 
-with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-        data_all_users = json.load(file)
-        data_all_users = data_all_users["users"]
-        print("data_all_users", len(data_all_users))
+def test_12():
+    with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            data_all_users = json.load(file)
+            data_all_users = data_all_users["users"]
+            print("data_all_users", len(data_all_users))
+
+def test_13():
+    string = str(datetime.now().strftime("%H:%M"))
+
+    string_now = str(datetime.now().strftime("%H:%M"))
+
+    date_object = datetime.strptime(string, '%H:%M')
+    date_object_now = datetime.strptime(str(datetime.now().strftime("%H:%M")), '%H:%M')
+
+    fifteen_minutes = timedelta(minutes=15)
+    print("date_object", date_object+fifteen_minutes)
+    print("date_object_now", date_object_now)
+
+    if date_object + fifteen_minutes >= date_object_now:
+        print(True)
+
+    else:
+        print(False)
+        
+test_6()

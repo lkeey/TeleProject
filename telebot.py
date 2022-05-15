@@ -42,12 +42,17 @@ def saving_data_of_user(user, data):
     
     print(data["get_weather"])
 
-
     print("WAS_ONLINE", data["was_online"])
+
+    print("User-data-MAIN", data["main"])
+
     if data["main"] == "online":
-        data_all_users["users"][str(user["id"])]["was_online"] = str(datetime.now())
+        data_all_users["users"][str(user["id"])]["was_online"] = str(datetime.now().strftime("%H:%M"))
     
     data_all_users["users"][str(user["id"])]["main"] = data["main"]
+    
+    print("Main", user["id"], data["main"])
+
     print("MAIN:", data_all_users["users"][str(user["id"])]["main"])
     data_all_users["users"][str(user["id"])]["rate_weather"] = data["rate_weather"]
     data_all_users["users"][str(user["id"])]["get_weather"] = data["get_weather"]
@@ -140,7 +145,7 @@ def start(update: Update, context: CallbackContext) -> None:
         "get_weather": False,
         "rate_weather": 0,
         "city": "DEFAULT",
-        "was_online": str(datetime.now())
+        "was_online": str(datetime.now().strftime("%H:%M")),
         }
 
     try:
@@ -362,26 +367,38 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
         with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             users_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+            user_data = users_data[str(user["id"])]
 
-    except:
+    except Exception as ex:
+        update.message.reply_text(str(ex)) 
         update.message.reply_text("Warninng in Statistics") 
 
-        # ЕЩЕ НЕ ГОТОВО
-        # Подсчет онлайн-пользователей
-    # counter_online = 0
-    # for user in users_data:
-    #     if users_data[user]["main"] == "online":
-    #         fifteen_minutes = timedelta(minutes=15)
-    #         if users_data[user]["was_online"] - fifteen_minutes >= datetime.now():
-    #             # OFF-LINE
-    #             user_data["main"] = "off-line"
+    counter_online = 0
+    for user_for in users_data:
+        if users_data[user_for]["main"] == "online":
+            fifteen_minutes = timedelta(minutes=15)
 
-    #             saving_data_of_user(user, user_data)
+                        # перевод из str в date-time-format
 
-    #         else:
-    #             counter_online += 1
-    # update.message.reply_text("Online: "+str(counter_online))
+            user_time = datetime.strptime(users_data[user_for]["was_online"], '%H:%M')
+
+            now_time = datetime.strptime(str(datetime.now().strftime("%H:%M")), '%H:%M') 
+
+            # Если не совершал никаих действий более 15 минут
+            if user_time + fifteen_minutes <= now_time:
+                # OFFLINE
+                user_data["main"] = "off-line"
+
+                print(users_data[user_for])
+
+                saving_data_of_user(users_data[user_for], user_data)
+                
+            # Онлайн
+            else:
+                counter_online += 1
+    
+
+    update.message.reply_text("Online: "+str(counter_online))
 
     # Добавить спрятанный текст
     update.message.reply_text("Общее количество пользователей, зарегистрированных в Future Forest: "+str(len(users_data)))
@@ -424,3 +441,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+    
