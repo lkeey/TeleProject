@@ -1,4 +1,10 @@
-# показывать дату регистрации
+#           Оложено:
+# Фотографии
+
+#           Разрабатывается
+# Работа с текстом (озвучка)
+# Работа с голосовыми сообщениями
+# Админ и обычный 
 
 from random import *
 from time import *
@@ -11,6 +17,10 @@ import sklearn
 import requests
 from telegram import Update, ForceReply, KeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from unittest import result
+from deepface import DeepFace
+import speedtest  
+import pyshorteners
 
 
 # Variables
@@ -19,7 +29,7 @@ tlgrm_tocken = "5366540233:AAEH04SZyyGE4uD7WvTHiRTXKxCvnQ-uqAM"
 
 # открытие словаря
 try:
-    with open("Technology/Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
+    with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
         BOT_CONFIG = json.load(file)
 except:
     print("WARNING")
@@ -30,7 +40,7 @@ def saving_data_of_user(user, data):
 
     # Открытие словаря
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             # Весь
             data_all_users = json.load(file)
             user_data = data_all_users["users"]
@@ -40,7 +50,9 @@ def saving_data_of_user(user, data):
     except:
         print("НЕВОЗМОЖНО ОТКРЫТЬ!")
     
-    print(data["get_weather"])
+    print("G-W",data["get_weather"])
+
+    print("URL:", data["get_url"])
 
     print("WAS_ONLINE", data["was_online"])
 
@@ -56,9 +68,10 @@ def saving_data_of_user(user, data):
     print("MAIN:", data_all_users["users"][str(user["id"])]["main"])
     data_all_users["users"][str(user["id"])]["rate_weather"] = data["rate_weather"]
     data_all_users["users"][str(user["id"])]["get_weather"] = data["get_weather"]
+    data_all_users["users"][str(user["id"])]["get_url"] = data["get_url"]
 
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
             data = {
                     "users": data_all_users["users"]
                     }
@@ -69,7 +82,7 @@ def saving_data_of_user(user, data):
 def add_online(user):
     # Открытие словаря
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             user_data = data_all_users["users"]
             user_data = user_data[str(user["id"])]
@@ -85,7 +98,7 @@ def get_password():
     # 8 символов
     all_passwords = list()
     
-    with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
         data_all_users = json.load(file)
         data_all_users = data_all_users["users"]
         
@@ -146,10 +159,12 @@ def start(update: Update, context: CallbackContext) -> None:
         "rate_weather": 0,
         "city": "DEFAULT",
         "was_online": str(datetime.now().strftime("%H:%M")),
+        "get_url": False,
+        "post": "User"
         }
 
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             data_all_users = data_all_users["users"]
     except:
@@ -159,7 +174,7 @@ def start(update: Update, context: CallbackContext) -> None:
     if not (data_user["id"] in data_all_users):
         data_all_users[data_user["id"]] = data_user
         try:
-            with open('Technology/Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+            with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
                 data = {
                         "users": data_all_users
                         }
@@ -207,7 +222,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 
     # Открытие словаря
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             user_data = data_all_users["users"]
             user_data = user_data[str(user["id"])]
@@ -218,12 +233,21 @@ def echo(update: Update, context: CallbackContext) -> None:
     get_weather = user_data["get_weather"] 
     print("GET_WEATHER:",get_weather)
 
+    get_url = user_data["get_url"] 
+    print("GET_URL:", get_url)
+
+    print(1, not get_weather and not get_url)
+    print(2, get_weather and not get_url)
+    print(3, get_url and not get_weather)
+
     """Echo the user message."""
-    if not get_weather:
+    if not get_weather and not get_url:
+        
         input_text = update.message.text
         reply = bot(input_text)
         update.message.reply_text(reply)
-    else:
+
+    elif get_weather and not get_url:
         rate_weather = user_data["rate_weather"] 
         print("rate_weather", rate_weather)
 
@@ -288,13 +312,41 @@ def echo(update: Update, context: CallbackContext) -> None:
                 update.message.reply_text("Warning in GET_WEATHER")
                 update.message.reply_text(data)   
                 update.message.reply_text(str(ex))
+
+        get_weather = user_data["get_weather"] 
+        print("GET_WEATHER:",get_weather)
+
+        get_url = user_data["get_url"] 
+        print("GET_URL:", get_url)
+
+    elif get_url and not get_weather:
+        url = update.message.text
+        try:
+
+            short = pyshorteners.Shortener()
+
+            update.message.reply_text("Получившийся url-адрес:")
+            update.message.reply_text(short.tinyurl.short((str(url))))
+
+            user_data["main"] = "online"
+            user_data["get_url"] = False
+            saving_data_of_user(user, user_data)
+
+        except Exception as ex:        
+            update.message.reply_text(str(ex))
+
+        get_weather = user_data["get_weather"] 
+        print("GET_WEATHER:",get_weather)
+
+        get_url = user_data["get_url"] 
+        print("GET_URL:", get_url)
             
 def weather(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
 
     # Открытие словаря
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             user_data = data_all_users["users"]
             user_data = user_data[str(user["id"])]
@@ -314,7 +366,7 @@ def smile(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     add_online(user)
     
-    with open('Technology/Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
+    with open('Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
         all_smiles = data["all_smiles"]
 
@@ -326,15 +378,16 @@ def new_smile(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     add_online(user)
 
-    with open('Technology/Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
+    with open('Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
         all_smiles = data["all_smiles"]
 
     sticker_id = update.message.sticker.file_id
     
+
     all_smiles.append(sticker_id)
 
-    with open('Technology/Data-Bases/Data-Smiles.json', 'w', encoding='utf-8') as file:
+    with open('Data-Bases/Data-Smiles.json', 'w', encoding='utf-8') as file:
         data = {
             "all_smiles": all_smiles
         }
@@ -347,7 +400,7 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     add_online(user)
     
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             user_data = data_all_users["users"]
             user_data = user_data[str(user["id"])]
@@ -361,8 +414,9 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Предпочтительный язык: "+str(user_data["language_code"]))
     update.message.reply_text("ID: "+str(user_data["id"]))
     update.message.reply_text("Логин: "+str(user_data["username"]))
-    update.message.reply_text("пароль: "+str(user_data["password"]))
+    update.message.reply_text("Пароль: "+str(user_data["password"]))
     update.message.reply_text("Статус: "+str(user_data["main"]))
+    update.message.reply_text("Пост "+str(user_data["post"]))
     update.message.reply_text("Был зарегистрирован: "+str(user_data["registered"]))
     update.message.reply_text("Intent-ы: "+str(user_data["points"]))
 
@@ -371,7 +425,7 @@ def print_bio(update: Update, context: CallbackContext) -> None:
 def print_statistics(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     try:
-        with open('Technology/Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)
             users_data = data_all_users["users"]
             user_data = users_data[str(user["id"])]
@@ -382,34 +436,131 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
 
     counter_online = 0
     for user_for in users_data:
-        if users_data[user_for]["main"] == "online":
-            fifteen_minutes = timedelta(minutes=15)
+
+        fifteen_minutes = timedelta(minutes=15)
 
                         # перевод из str в date-time-format
 
-            user_time = datetime.strptime(users_data[user_for]["was_online"], '%H:%M')
+        user_time = datetime.strptime(users_data[user_for]["was_online"], '%H:%M')
 
-            now_time = datetime.strptime(str(datetime.now().strftime("%H:%M")), '%H:%M') 
+        now_time = datetime.strptime(str(datetime.now().strftime("%H:%M")), '%H:%M') 
 
+        if users_data[user_for]["main"] == "online":
+            
             # Если не совершал никаих действий более 15 минут
-            if user_time + fifteen_minutes <= now_time:
-                # OFFLINE
-                user_data["main"] = "off-line"
+            # not user_time + fifteen_minutes <= now_time and not user_time + fifteen_minutes >= now_time:
+                
+            # Онлайн
+            if user_time + fifteen_minutes >= now_time:
+                print("User_time:", user_time+fifteen_minutes)
+                print("Now:", now_time)
+                print(users_data[user_for]["main"] == "online")
+                counter_online += 1
 
+            # OFFLINE
+            else:
+                user_data["main"] = "off-line"
+               
                 print(users_data[user_for])
 
                 saving_data_of_user(users_data[user_for], user_data)
-                
-            # Онлайн
-            else:
-                counter_online += 1
-    
+ 
+        print(1, user_time + fifteen_minutes <= now_time)
+        print(2, user_time + fifteen_minutes >= now_time)
+        
+        print("User_time:", user_time+fifteen_minutes)
+        print("Now:", now_time)
 
     update.message.reply_text("Online: "+str(counter_online))
 
     # Добавить спрятанный текст
     update.message.reply_text("Общее количество пользователей, зарегистрированных в Future Forest: "+str(len(users_data)))
 
+# Обработка фотографий
+def analyze_photo(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+    add_online(user)
+    
+    update.message.reply_text("Photo was saved")
+    
+    # # текст айди
+    # update.message.reply_text(str(photo_id))
+    # # сама фотография
+    # update.message.reply_photo(str(photo_id))
+
+    with open('Data-Bases/Data-Photos.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+        all_photos = data["all_photos"]
+
+    #  Уникальный айди фото
+    photo_id = update.message.photo[0].file_id
+
+    all_photos.append(photo_id)
+
+    # добавление в json-файл
+    with open('Data-Bases/Data-Photos.json', 'w', encoding='utf-8') as file:
+        data = {
+            "all_photos": all_photos
+        }
+        json.dump(data, file, sort_keys = True)
+   
+    # try:
+    #     file_info = dispatcher.get_file(photo_id)
+    #     downloaded_file = dispatcher.download_file(file_info.file_path)
+    #     src='Data-Bases/'+file_info.file_path
+    #     with open(src, 'wb') as new_file:
+    #         new_file.write(downloaded_file)
+    #         result_dict = DeepFace.analyze(new_file, actions=["emotion"])
+    #     update.message.reply_text("Photo was added")
+
+
+    #     result_dict = DeepFace.analyze(photo_id, actions=["age", "gender", "race", "emotion"])
+    #     print(result_dict)
+        
+
+    # except Exception as _Ex:
+    #     update.message.reply_text(str(_Ex))
+
+# Проверка интернета
+def ethernet_check(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+    add_online(user)
+    
+    try:
+        st = speedtest.Speedtest() 
+
+        update.message.reply_text("Немного подождите...\nВыполняется проверка интернета")
+
+        #  Скачка
+        update.message.reply_text("Скорость скачивания:\n"+str(st.download())+" Mbit/s")
+        #  Загрузка
+        update.message.reply_text("Скорость загрузки:\n"+str(st.upload())+" Mbit/s")
+        #  Пинг
+        servernames =[]   
+        st.get_servers(servernames)       
+        update.message.reply_text("Пинг:\n"+str(st.results.ping)+" ms")
+    except Exception as _Ex:
+        update.message.reply_text(str(_Ex))
+
+def cute_url(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+
+    # Открытие словаря
+    try:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            data_all_users = json.load(file)
+            user_data = data_all_users["users"]
+            user_data = user_data[str(user["id"])]
+
+    except:
+        update.message.reply_text("Warninng in GET-DATA")
+
+    user_data["get_url"] = True
+    user_data["main"] = "online"
+
+    saving_data_of_user(user, user_data)
+
+    update.message.reply_text("Write Url:")
 
 # Главная функция
 def main() -> None:
@@ -429,9 +580,16 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("weather", weather))
     dispatcher.add_handler(CommandHandler("smile", smile))
     dispatcher.add_handler(CommandHandler("bio", print_bio))
-    dispatcher.add_handler(CommandHandler("statistics", print_statistics))
+    dispatcher.add_handler(CommandHandler("statistics", print_statistics))    
+    dispatcher.add_handler(CommandHandler("url", cute_url))
+    dispatcher.add_handler(CommandHandler("ethernet", ethernet_check))    
+        
     
+
+
     dispatcher.add_handler(MessageHandler(Filters.sticker, new_smile))
+    dispatcher.add_handler(MessageHandler(Filters.photo, analyze_photo))
+
 
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text, echo))

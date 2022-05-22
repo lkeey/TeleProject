@@ -1,5 +1,8 @@
 import json
 from datetime import datetime, timedelta
+import telebot
+from unittest import result
+from deepface import DeepFace
 
 def test():
     counter = 0
@@ -108,7 +111,9 @@ data_user = {
         "get_weather": False,
         "rate_weather": 0,
         "city": "DEFAULT",
-        "was_online": str(datetime.now().strftime("%H:%M"))
+        "was_online": str(datetime.now().strftime("%H:%M")),
+        "get_url": False,
+        "post": "User"
         }
 
 
@@ -128,7 +133,7 @@ def test_6():
     else:
         print("Уже есть")
 
-    with open('Technology/Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+    with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
         data = {
                 "users": data_all_users
                 }
@@ -138,6 +143,8 @@ def test_6():
 
     print(len(data))
     # {"users": {"1010205515": {"first_name": "\u041b\u0451\u0448\u0430", "id": "1010205515", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "1580133018": {"first_name": "Daria", "id": "1580133018", "language_code": "ru", "last_name": null, "username": null}, "56": {"first_name": "\u041b\u0451\u0448\u0430", "id": "56", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "952492649": {"first_name": "TT:", "id": "952492649", "language_code": "ru", "last_name": "hopelesdeath", "username": "LoveYouW0W"}}}
+
+test_6()
 
 def test_7():
     data_all_users = {'1010205515': {'first_name': 'Лёша', 'id': '1010205515', 'language_code': 'en', 'last_name': 'Кирюшин', 'username': 'l_keey'}, '1580133018': {'first_name': 'Daria', 'id': '1580133018', 'language_code': 'ru', 'last_name': None, 'username': None}, '56': 
@@ -210,4 +217,38 @@ def test_14():
     print("humidity", humidity)
 
 
-test_14()
+# Айди фото
+
+# [<telegram.files.photosize.PhotoSize object at 
+# 0x000001E1BC64BCA0>, <telegram.files.photosize.PhotoSize 
+# object at 0x000001E1BC64BD60>, <telegram.files.photosize.
+# PhotoSize object at 0x000001E1BC64BDC0>, <telegram.files.
+# photosize.PhotoSize object at 0x000001E1BC64BE20>]
+
+bot = telebot.TeleBot("5366540233:AAEH04SZyyGE4uD7WvTHiRTXKxCvnQ-uqAM")
+
+def face_analyze(img_1st):
+    try:
+        print("ТУТ")
+        result_dict = DeepFace.analyze(img_1st, actions=["emotion"])
+        print("ЗДЕСЬ")
+        print("DICT:", result_dict)
+        
+    except Exception as _Except:
+        return _Except
+
+@bot.message_handler(content_types=['photo'])
+def handle_docs_photo(message):
+    try:
+        file_info = bot.get_file(message.photo[0].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src='Data-Bases/'+file_info.file_path
+        with open(src, 'w') as new_file:
+            face_analyze(new_file)
+        bot.reply_to(message,"Фото добавлено") 
+
+    except Exception as e:
+        bot.reply_to(message, e)
+
+# bot.polling()
