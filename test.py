@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 import telebot
 from unittest import result
 from deepface import DeepFace
+import qrcode
+import numpy as np 
 
 def test():
     counter = 0
@@ -76,17 +78,17 @@ def test_5():
         json.dump(data, file, sort_keys = True)
 
 
-def test_6():
-    smile_1st = "cAAVK_mSpW_9hfOrH4cTWckQ"
-    smile_2nd = "p_csFbW_3MgAABA5JOLqR-Pg"
-    print(len(smile_1st))
-    smile_3rd = "CAACAgIAAxkBAAIBUmJ5eJCiqOh0O8UL-puFfhUxtxfLAAKWDAACC1sZSkTJo0Tt48bJJAQ"
-    count = 0
-    for i in range(len(smile_1st)):
-        if smile_1st[i] != smile_2nd[i]:
-            count += 1
-    print(count)
-    print(smile_1st == smile_2nd)
+# def test_6():
+#     smile_1st = "cAAVK_mSpW_9hfOrH4cTWckQ"
+#     smile_2nd = "p_csFbW_3MgAABA5JOLqR-Pg"
+#     print(len(smile_1st))
+#     smile_3rd = "CAACAgIAAxkBAAIBUmJ5eJCiqOh0O8UL-puFfhUxtxfLAAKWDAACC1sZSkTJo0Tt48bJJAQ"
+#     count = 0
+#     for i in range(len(smile_1st)):
+#         if smile_1st[i] != smile_2nd[i]:
+#             count += 1
+#     print(count)
+#     print(smile_1st == smile_2nd)
 
 
 
@@ -97,12 +99,13 @@ user = {'last_name': 'Кирюшин', 'language_code': 'en',
         }
 
 data_user = {
+        
         'last_name': user["last_name"], 
         'language_code': user["language_code"], 
         'id': str(user["id"]), 
         'username': user["username"], 
         'first_name': user["first_name"],
-        'password': "ygh$!78",
+        'password': "457n@4/2",
         'points': 0,
         'registered': str(datetime.now().strftime("%D %H:%M:%C")),
 
@@ -113,8 +116,11 @@ data_user = {
         "city": "DEFAULT",
         "was_online": str(datetime.now().strftime("%H:%M")),
         "get_url": False,
-        "post": "User"
+        "post": "User",
+        "get_sentence": False,
+        "get_qr": False,
         }
+
 
 
 def test_6():
@@ -144,7 +150,6 @@ def test_6():
     print(len(data))
     # {"users": {"1010205515": {"first_name": "\u041b\u0451\u0448\u0430", "id": "1010205515", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "1580133018": {"first_name": "Daria", "id": "1580133018", "language_code": "ru", "last_name": null, "username": null}, "56": {"first_name": "\u041b\u0451\u0448\u0430", "id": "56", "language_code": "en", "last_name": "\u041a\u0438\u0440\u044e\u0448\u0438\u043d", "username": "l_keey"}, "952492649": {"first_name": "TT:", "id": "952492649", "language_code": "ru", "last_name": "hopelesdeath", "username": "LoveYouW0W"}}}
 
-test_6()
 
 def test_7():
     data_all_users = {'1010205515': {'first_name': 'Лёша', 'id': '1010205515', 'language_code': 'en', 'last_name': 'Кирюшин', 'username': 'l_keey'}, '1580133018': {'first_name': 'Daria', 'id': '1580133018', 'language_code': 'ru', 'last_name': None, 'username': None}, '56': 
@@ -252,3 +257,25 @@ def handle_docs_photo(message):
         bot.reply_to(message, e)
 
 # bot.polling()
+
+import os
+def test_15():
+    filename = "qrcode2.png"
+    # создать экземпляр объекта QRCode
+    qr = qrcode.QRCode(version=1, box_size=7, border=4)
+    # добавить данные в QR-код
+    qr.add_data("https://vk.com/l_keey")
+    # компилируем данные в массив QR-кода
+    qr.make()
+    # распечатать форму изображения
+    print("The shape of the QR image:", np.array(qr.get_matrix()).shape)
+    # переносим массив в реальное изображение
+    img = qr.make_image(fill_color="#eca1a6", back_color="black")
+    # сохраняем в файл
+    img.save(filename) 
+    img = Image.open(filename)
+    img.show()
+
+    os.remove(filename)
+
+test_15()

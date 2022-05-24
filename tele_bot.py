@@ -1,5 +1,6 @@
 #           Оложено:
 # Фотографии
+# Скачка данных с сайта
 
 #           Разрабатывается
 # Работа с текстом (озвучка)
@@ -21,7 +22,12 @@ from unittest import result
 from deepface import DeepFace
 import speedtest  
 import pyshorteners
-
+import wget
+import wikipedia
+import re
+import qrcode
+import numpy as np 
+import os
 
 # Variables
 open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
@@ -58,6 +64,10 @@ def saving_data_of_user(user, data):
 
     print("User-data-MAIN", data["main"])
 
+    print("GET_SENTENCE:", data["get_sentence"])
+
+    print("GET_QR:", data["get_qr"])
+
     if data["main"] == "online":
         data_all_users["users"][str(user["id"])]["was_online"] = str(datetime.now().strftime("%H:%M"))
     
@@ -69,6 +79,8 @@ def saving_data_of_user(user, data):
     data_all_users["users"][str(user["id"])]["rate_weather"] = data["rate_weather"]
     data_all_users["users"][str(user["id"])]["get_weather"] = data["get_weather"]
     data_all_users["users"][str(user["id"])]["get_url"] = data["get_url"]
+    data_all_users["users"][str(user["id"])]["get_sentence"] = data["get_sentence"]
+    data_all_users["users"][str(user["id"])]["get_qr"] = data["get_qr"]
 
     try:
         with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
@@ -160,7 +172,9 @@ def start(update: Update, context: CallbackContext) -> None:
         "city": "DEFAULT",
         "was_online": str(datetime.now().strftime("%H:%M")),
         "get_url": False,
-        "post": "User"
+        "post": "User",
+        "get_sentence": False,
+        "get_qr": False,
         }
 
     try:
@@ -230,24 +244,40 @@ def echo(update: Update, context: CallbackContext) -> None:
     except:
         update.message.reply_text("Warninng in GET-DATA")
 
+    lang = user_data["language_code"] 
+    print("LANG:", lang)
+
+    id = user_data["id"]
+    print("ID:", id)
+
     get_weather = user_data["get_weather"] 
     print("GET_WEATHER:",get_weather)
 
     get_url = user_data["get_url"] 
     print("GET_URL:", get_url)
 
-    print(1, not get_weather and not get_url)
-    print(2, get_weather and not get_url)
-    print(3, get_url and not get_weather)
+    get_sentence = user_data["get_sentence"] 
+    print("GET_SENTENCE:", get_sentence)
+
+    get_qr = user_data["get_qr"] 
+    print("GET_QR:", get_qr)
+
+
+
+    print(1, not get_weather and not get_url and not get_sentence and not get_qr)
+    print(2, get_weather and not get_url and not get_sentence and not get_qr)
+    print(3, get_url and not get_weather and not get_sentence and not get_qr)
+    print(4, get_sentence and not get_url and not get_weather and not get_qr)
+    print(5, get_qr and not get_weather and not get_url and not get_sentence)
 
     """Echo the user message."""
-    if not get_weather and not get_url:
+    if not get_weather and not get_url and not get_sentence and not get_qr:
         
         input_text = update.message.text
         reply = bot(input_text)
         update.message.reply_text(reply)
 
-    elif get_weather and not get_url:
+    elif get_weather and not get_url and not get_sentence and not get_qr:
         rate_weather = user_data["rate_weather"] 
         print("rate_weather", rate_weather)
 
@@ -313,13 +343,7 @@ def echo(update: Update, context: CallbackContext) -> None:
                 update.message.reply_text(data)   
                 update.message.reply_text(str(ex))
 
-        get_weather = user_data["get_weather"] 
-        print("GET_WEATHER:",get_weather)
-
-        get_url = user_data["get_url"] 
-        print("GET_URL:", get_url)
-
-    elif get_url and not get_weather:
+    elif get_url and not get_weather and not get_sentence and not get_qr:
         url = update.message.text
         try:
 
@@ -340,7 +364,58 @@ def echo(update: Update, context: CallbackContext) -> None:
 
         get_url = user_data["get_url"] 
         print("GET_URL:", get_url)
+
+    elif get_sentence and not get_url and not get_weather and not get_qr:
+        sentence = update.message.text
+
+        try:
+            wikipedia.set_lang(str(lang))
+            print(lang)
+            request = wikipedia.summary(str(sentence), sentences=2)
+            # update.message.reply_text(request) 
             
+            request=re.sub('\([^()]*\)', '', request) 
+            request=re.sub('\([^()]*\)', '', request) 
+            request=re.sub('\{[^\{\}]*\}', '', request) 
+
+            update.message.reply_text(request) 
+
+            user_data["main"] = "online"
+            user_data["get_sentence"] = False
+            saving_data_of_user(user, user_data)
+
+        except Exception as _Ex:
+            update.message.reply_text("Warning in Wiki:")
+            update.message.reply_text(str(_Ex))
+
+    elif get_qr and not get_weather and not get_url and not get_sentence:
+        smth = sentence = update.message.text
+        try:
+            filename = f"qrcode{id}.png"
+            # создать экземпляр объекта QRCode
+            qr = qrcode.QRCode(version=1, box_size=7, border=4)
+            # добавить данные в QR-код
+            qr.add_data(smth)
+            # компилируем данные в массив QR-кода
+            qr.make()
+            # распечатать форму изображения
+            print("The shape of the QR image:", np.array(qr.get_matrix()).shape)
+            # переносим массив в реальное изображение
+            img = qr.make_image(fill_color="#eca1a6", back_color="black")
+            # сохраняем в файл
+            img.save(filename) 
+
+            with open(filename, "rb") as file:
+                update.message.reply_photo(file)
+            os.remove(filename)
+
+            user_data["main"] = "online"
+            user_data["get_qr"] = False
+            saving_data_of_user(user, user_data)
+
+        except Exception as _Ex:
+            update.message.reply_text(str(_Ex))
+       
 def weather(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
 
@@ -416,7 +491,7 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Логин: "+str(user_data["username"]))
     update.message.reply_text("Пароль: "+str(user_data["password"]))
     update.message.reply_text("Статус: "+str(user_data["main"]))
-    update.message.reply_text("Пост "+str(user_data["post"]))
+    update.message.reply_text("Пост: "+str(user_data["post"]))
     update.message.reply_text("Был зарегистрирован: "+str(user_data["registered"]))
     update.message.reply_text("Intent-ы: "+str(user_data["points"]))
 
@@ -435,6 +510,8 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Warninng in Statistics") 
 
     counter_online = 0
+    admin_counter = 0
+
     for user_for in users_data:
 
         fifteen_minutes = timedelta(minutes=15)
@@ -465,6 +542,9 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
 
                 saving_data_of_user(users_data[user_for], user_data)
  
+        if users_data[user_for]["post"] == "Admin":
+            admin_counter += 1
+
         print(1, user_time + fifteen_minutes <= now_time)
         print(2, user_time + fifteen_minutes >= now_time)
         
@@ -472,6 +552,8 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
         print("Now:", now_time)
 
     update.message.reply_text("Online: "+str(counter_online))
+    update.message.reply_text("Admins: "+str(admin_counter))
+
 
     # Добавить спрятанный текст
     update.message.reply_text("Общее количество пользователей, зарегистрированных в Future Forest: "+str(len(users_data)))
@@ -562,6 +644,47 @@ def cute_url(update: Update, context: CallbackContext) -> None:
 
     update.message.reply_text("Write Url:")
 
+def search_wiki(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+
+    # Открытие словаря
+    try:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            data_all_users = json.load(file)
+            user_data = data_all_users["users"]
+            user_data = user_data[str(user["id"])]
+
+    except:
+        update.message.reply_text("Warninng in GET-DATA")
+
+    user_data["get_sentence"] = True
+    user_data["main"] = "online"
+
+    saving_data_of_user(user, user_data)
+
+    update.message.reply_text("Write Request:")
+
+def qr_code(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+
+    # Открытие словаря
+    try:
+        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            data_all_users = json.load(file)
+            user_data = data_all_users["users"]
+            user_data = user_data[str(user["id"])]
+
+    except:
+        update.message.reply_text("Warninng in GET-DATA")
+
+    user_data["get_qr"] = True
+    user_data["main"] = "online"
+
+    saving_data_of_user(user, user_data)
+
+    update.message.reply_text("Write Something(url, sentence, contact...):")
+
+
 # Главная функция
 def main() -> None:
     print("MAIN")
@@ -583,9 +706,10 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("statistics", print_statistics))    
     dispatcher.add_handler(CommandHandler("url", cute_url))
     dispatcher.add_handler(CommandHandler("ethernet", ethernet_check))    
+    dispatcher.add_handler(CommandHandler("wiki", search_wiki))    
+    dispatcher.add_handler(CommandHandler("qr", qr_code))    
         
     
-
 
     dispatcher.add_handler(MessageHandler(Filters.sticker, new_smile))
     dispatcher.add_handler(MessageHandler(Filters.photo, analyze_photo))
