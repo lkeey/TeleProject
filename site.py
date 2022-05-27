@@ -43,40 +43,40 @@ def add_message(example, response, topic):
  # Добавляем новое сообщение в список
     print("intents_list",intents_list)
 
-                                     # Функции для браузера
+                # Функции для браузера
 # Главная страница
 @app.route("/")
 def index_page():
     return "Hello, welcome to TeleWeb"
 
 
-# Раздел со списком сообщений
-@app.route("/get_intents")
-def get_messages():
-    return {"intents": intents_list} 
+# # Раздел со списком сообщений
+# @app.route("/get_intents")
+# def get_messages():
+#     return {"intents": intents_list} 
 
 
-# Раздел для отправки сообщения
-@app.route("/send_intents")
-def send_intents():
-    example = request.args["examples"]
-    responce = request.args["responses"]
+# # Раздел для отправки сообщения
+# @app.route("/send_intents")
+# def send_intents():
+#     example = request.args["examples"]
+#     responce = request.args["responses"]
 
-    if len(example) > 100 or len(example) < 2:
-        return "ERROR"
+#     if len(example) > 100 or len(example) < 2:
+#         return "ERROR"
 
-    if len(responce) > 1000 or len(responce) == 0:
-        return "ERROR"
+#     if len(responce) > 1000 or len(responce) == 0:
+#         return "ERROR"
 
-    add_message(example, responce)
-    save_intents()  # Сохраняем все сообщение в файл
-    return "Your message was sent"
+#     add_message(example, responce)
+#     save_intents()  # Сохраняем все сообщение в файл
+#     return "Your message was sent"
 
 
 # Раздел с визуальным интерфейсом
 @app.route("/form")
 def form():
-    return render_template("index.html")
+    return render_template("log_in/index.html")
 
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=80)

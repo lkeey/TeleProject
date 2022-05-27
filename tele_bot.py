@@ -6,7 +6,7 @@
 # Работа с текстом (озвучка)
 # Работа с голосовыми сообщениями
 # Админ и обычный 
-
+import wiki_search
 from random import *
 from time import *
 from datetime import datetime, timedelta
@@ -28,17 +28,19 @@ import re
 import qrcode
 import numpy as np 
 import os
+import emoji
 
 # Variables
 open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
 tlgrm_tocken = "5366540233:AAEH04SZyyGE4uD7WvTHiRTXKxCvnQ-uqAM"
+google_search = "AIzaSyBzdzDll3gyr7867TsfI2FbIcuEzl_8crA"
 
 # открытие словаря
 try:
     with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
         BOT_CONFIG = json.load(file)
 except:
-    print("WARNING")
+    print("WARNING ⚠")
 
 print("Successfully")
 
@@ -140,10 +142,11 @@ def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
-        fr'Hi {user.mention_markdown_v2()}\!',
+        emoji.emojize(fr'Hi, {user.mention_markdown_v2()}\!:v:', language = 'alias'),
         reply_markup=ForceReply(selective=True),
+        
     )
-    update.message.reply_text(fr'{user.mention_markdown_v2()}\!') 
+    # update.message.reply_text(fr'{user.mention_markdown_v2()}\!') 
 
     # update.message.reply_text(str(user))
     # {'last_name': 'Кирюшин', 'language_code': 'en', 
@@ -182,7 +185,7 @@ def start(update: Update, context: CallbackContext) -> None:
             data_all_users = json.load(file)
             data_all_users = data_all_users["users"]
     except:
-        update.message.reply_text("Warning in open BASE-DATA")
+        update.message.reply_text(emoji.emojize("Warning in open BASE-DATA :warning:\nPlease, write /error", language = 'alias' ))
 
     # если не зареган
     if not (data_user["id"] in data_all_users):
@@ -194,12 +197,12 @@ def start(update: Update, context: CallbackContext) -> None:
                         }
                 json.dump(data, file, sort_keys = True)
         except:
-            update.message.reply_text("Warning in open data-user")
+            update.message.reply_text(emoji.emojize("Warning in open data-user :warning:\nPlease, write /error", language = 'alias' ))
 
-        update.message.reply_text("Вы были успешно зарегистрированы!")
+        update.message.reply_text(emoji.emojize("Вы были успешно зарегистрированы! :globe_with_meridians:", language = 'alias' ))
     else:
         
-        update.message.reply_text("С возвращением)\nВижу, вы уже были здесь зарегистрированы!")
+        update.message.reply_text(emoji.emojize("С возвращением)\nВижу:eyes:, вы уже были здесь зарегистрированы!", language = 'alias'))
     # update.message.reply_text(str(len(data_all_users)))
         # Остальные сообщения
 corpus = []
@@ -242,7 +245,7 @@ def echo(update: Update, context: CallbackContext) -> None:
             user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA")
+        update.message.reply_text(emoji.emojize("Warninng in GET-DATA :warning:\nPlease, write /error", language = 'alias' ))
 
     lang = user_data["language_code"] 
     print("LANG:", lang)
@@ -332,14 +335,36 @@ def echo(update: Update, context: CallbackContext) -> None:
                 sunset_timestamp = datetime.fromtimestamp(data['sys']['sunset'])
                 # length_of_day = datetime.fromtimestamp(data['sys']['sunset']) - datetime.datetime.fromtimestamp(data['sys']['sunrise'])
                 length_of_day = sunset_timestamp - sunrise_timestamp
-                update.message.reply_text('***'+str(datetime.now().strftime('%Y-%m-%d %H:%M'))+'***')
-                update.message.reply_text('Погода в городе: '+str(city)+', '+str(country)+'\nТемпература: '+str(cur_weather)+'°C\nСкорость ветра: '+str(wind)+'м\с')
-                update.message.reply_text("Описание: "+str(description)+'\nВидимость: '+str(visibility)+'\nВлажность: '+str(humidity))
-                update.message.reply_text('Восход солнца: '+str(sunrise_timestamp)+'\nЗакат солнца: '+str(sunset_timestamp)+'\nПродолжительность дня: '+str(length_of_day))
-                update.message.reply_text('Одевайся по погоде!)')              
+                
+                
+                # EMOJIZE
+                    # Temperature
+                if int(cur_weather) >= 15:
+                    emoji_weather = ':sunny:'
+                elif int(cur_weather) >= 0 and int(cur_weather) < 15:
+                    emoji_weather = ':neutral_face:'
+                else:
+                    emoji_weather = ":snowflake:"
+
+                    # Description
+                if description == "Clouds":
+                    emoji_description = ":cloud:"
+                elif description == "Rain":
+                    emoji_description = ":umbrella:"
+                else:
+                    emoji_description = ":partly_sunny:"
+
+                    # Visibility
+                emoji_visibility = ":foggy:"
+                
+                update.message.reply_text(emoji.emojize('***'+str(datetime.now().strftime('%Y-%m-%d :watch: %H:%M'))+'***', language = 'alias'))
+                update.message.reply_text(emoji.emojize(f'Погода в городе: '+str(city)+', '+str(country)+' :house_with_garden:\nТемпература: '+str(cur_weather)+f"°C {emoji_weather}\nСкорость ветра: "+str(wind)+'м\с :dash:', language = 'alias'))
+                update.message.reply_text(emoji.emojize(f"Описание: "+str(description)+f' {emoji_description}\nВидимость: '+str(visibility)+f' {emoji_visibility}\nВлажность: '+str(humidity)+' :droplet:', language = 'alias'))
+                update.message.reply_text(emoji.emojize('Восход солнца: '+str(sunrise_timestamp)+' :sunrise:\nЗакат солнца: '+str(sunset_timestamp)+' :city_sunset:\nПродолжительность дня: '+str(length_of_day)+' :hourglass:', language = 'alias'))
+                update.message.reply_text(emoji.emojize('Одевайся по погоде!) :necktie:',language = 'alias'))              
 
             except Exception as ex:
-                update.message.reply_text("Warning in GET_WEATHER")
+                update.message.reply_text("Warning in GET_WEATHER ⚠\nPlease, write /error")
                 update.message.reply_text(data)   
                 update.message.reply_text(str(ex))
 
@@ -349,44 +374,85 @@ def echo(update: Update, context: CallbackContext) -> None:
 
             short = pyshorteners.Shortener()
 
-            update.message.reply_text("Получившийся url-адрес:")
+            update.message.reply_text(emoji.emojize("Получившийся url-адрес: :sparkles:", language = 'alias'))
             update.message.reply_text(short.tinyurl.short((str(url))))
 
             user_data["main"] = "online"
             user_data["get_url"] = False
             saving_data_of_user(user, user_data)
 
-        except Exception as ex:        
+        except Exception as ex:    
+                
+            update.message.reply_text("Warning in PRETTY URL ⚠\nPlease, write /error")
             update.message.reply_text(str(ex))
 
-        get_weather = user_data["get_weather"] 
-        print("GET_WEATHER:",get_weather)
+        # get_weather = user_data["get_weather"] 
+        # print("GET_WEATHER:",get_weather)
 
-        get_url = user_data["get_url"] 
-        print("GET_URL:", get_url)
-
+        # get_url = user_data["get_url"] 
+        # print("GET_URL:", get_url)
+    
     elif get_sentence and not get_url and not get_weather and not get_qr:
         sentence = update.message.text
+ 
+        update.message.reply_text("Выполняю поиск по Wikipedia 🔎\nПожалуйста, подождите...") 
+ 
+        # try:
+        #     page = wikipedia.page(sentence)
+           
+        # except wikipedia.DisambiguationError as e:
+        #     chosen = choice(e.options)
+        #     page = wikipedia.page(chosen)
+        #     update.message.reply_text("Слишком много страниц...\nРасскажу о "+str(page)) 
 
+          
+        print(lang)
+        page = wiki_search.searching(sentence, lang)
+        print(page)
+        while True:
+            try:
+                request = wikipedia.summary(page, sentences=1)
+                break
+            except Exception as e:
+                chosen = choice(e.options)
+                page = wikipedia.page(chosen)
+
+        request=re.sub('\([^()]*\)', '', request) 
+        request=re.sub('\([^()]*\)', '', request) 
+        request=re.sub('\{[^\{\}]*\}', '', request)
+
+        
+        update.message.reply_text(request) 
         try:
-            wikipedia.set_lang(str(lang))
-            print(lang)
-            request = wikipedia.summary(str(sentence), sentences=2)
-            # update.message.reply_text(request) 
-            
-            request=re.sub('\([^()]*\)', '', request) 
-            request=re.sub('\([^()]*\)', '', request) 
-            request=re.sub('\{[^\{\}]*\}', '', request) 
+            # выбор файла
+            if len(wikipedia.page(request).images) >= 0:
+                for i in range(len(wikipedia.page(request).images)):
+                    url = wikipedia.page(request).images[i]
+                    
+                    if "png" in url:
+                        filename = f"wiki{id}.png"
+                        wget.download(url, filename)
 
-            update.message.reply_text(request) 
+                        with open(filename, "rb") as file_send:
+                            update.message.reply_photo(file_send)
 
-            user_data["main"] = "online"
-            user_data["get_sentence"] = False
-            saving_data_of_user(user, user_data)
+                        os.remove(filename)
+                        print(url)
+                        break
+
+            # url = f"https://api.telegram.org/bot<{tlgrm_tocken}>/sendPhoto"
+            # files = {'photo': open("templates/global_page/img/1st_pict.jpg", 'rb')}
+            # data = {'chat_id' : "1010205515"}
+            # r= requests.post(url, files=files, data=data)
+            # print(r.json())
 
         except Exception as _Ex:
-            update.message.reply_text("Warning in Wiki:")
-            update.message.reply_text(str(_Ex))
+            update.message.reply_text("Warning in Wiki ⚠\nPlease, write /error") 
+            print(_Ex)
+
+        user_data["main"] = "online"
+        user_data["get_sentence"] = False
+        saving_data_of_user(user, user_data)
 
     elif get_qr and not get_weather and not get_url and not get_sentence:
         smth = sentence = update.message.text
@@ -413,7 +479,11 @@ def echo(update: Update, context: CallbackContext) -> None:
             user_data["get_qr"] = False
             saving_data_of_user(user, user_data)
 
+            # update.message.reply_text("Warning in QR ⚠\nPlease, write /error")
+
+
         except Exception as _Ex:
+            update.message.reply_text("Warning in QR ⚠\nPlease, write /error")
             update.message.reply_text(str(_Ex))
        
 def weather(update: Update, context: CallbackContext) -> None:
@@ -427,7 +497,7 @@ def weather(update: Update, context: CallbackContext) -> None:
             user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA")
+        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
 
     user_data["rate_weather"] = 1
     user_data["get_weather"] = True
@@ -435,7 +505,7 @@ def weather(update: Update, context: CallbackContext) -> None:
 
     saving_data_of_user(user, user_data)
     
-    update.message.reply_text("Write City:")
+    update.message.reply_text(emoji.emojize("Введите город: :house:",language = 'alias'))
 
 def smile(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
@@ -447,7 +517,7 @@ def smile(update: Update, context: CallbackContext) -> None:
 
     random_smile = choice(all_smiles)
     update.message.reply_sticker(random_smile)
-    update.message.reply_text("у меня очень мало стикеров(( Пришли мне пару своих..)\nУ меня лишь "+str(len(all_smiles))+" стикера(-ов)")
+    update.message.reply_text(emoji.emojize("У меня очень мало стикеров(( Пришли мне пару своих..) :relaxed:\nЛишь "+str(len(all_smiles))+" стикера(-ов)", language = 'alias'))
 
 def new_smile(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
@@ -468,7 +538,7 @@ def new_smile(update: Update, context: CallbackContext) -> None:
         }
         json.dump(data, file, sort_keys = True)
 
-    update.message.reply_text("Твой стик был успешно добавлен...)")
+    update.message.reply_text("Твой стик был успешно добавлен...) 😊")
 
 def print_bio(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
@@ -481,21 +551,21 @@ def print_bio(update: Update, context: CallbackContext) -> None:
             user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in BIO")
+        update.message.reply_text("Warninng in BIO ⚠\nPlease, write /error")
 
-    update.message.reply_text("*** BIO ***")
-    update.message.reply_text("Имя: "+str(user_data["first_name"]))
-    update.message.reply_text("Фамилия: "+str(user_data["last_name"]))
-    update.message.reply_text("Предпочтительный язык: "+str(user_data["language_code"]))
-    update.message.reply_text("ID: "+str(user_data["id"]))
-    update.message.reply_text("Логин: "+str(user_data["username"]))
-    update.message.reply_text("Пароль: "+str(user_data["password"]))
-    update.message.reply_text("Статус: "+str(user_data["main"]))
-    update.message.reply_text("Пост: "+str(user_data["post"]))
-    update.message.reply_text("Был зарегистрирован: "+str(user_data["registered"]))
-    update.message.reply_text("Intent-ы: "+str(user_data["points"]))
+    # update.message.reply_text("*** BIO ***")
+    update.message.reply_text(emoji.emojize("Имя: "+str(user_data["first_name"])+" :bust_in_silhouette:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Фамилия: "+str(user_data["last_name"])+" :credit_card:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Предпочтительный язык: "+str(user_data["language_code"])+" :tongue:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("ID: "+str(user_data["id"])+" :id:", language = 'alias' ))
+    update.message.reply_text(emoji.emojize("Логин: "+str(user_data["username"])+" :lock:", language = 'alias'  ))
+    update.message.reply_text(emoji.emojize("Пароль: "+str(user_data["password"])+" :key:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Статус: "+str(user_data["main"])+" :free:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Пост: "+str(user_data["post"])+" :chart_with_upwards_trend:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Был зарегистрирован: "+str(user_data["registered"])+" ⓡ", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Roots: "+str(user_data["points"])+" :deciduous_tree:", language = 'alias'))
 
-    update.message.reply_text("Чтобы заработать Intent-ы переходи сюда:(url...)")
+    update.message.reply_text(emoji.emojize("Чтобы заработать Intent-ы переходи сюда:(url...) :link:", language = 'alias'))
     
 def print_statistics(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
@@ -507,7 +577,7 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
 
     except Exception as ex:
         update.message.reply_text(str(ex)) 
-        update.message.reply_text("Warninng in Statistics") 
+        update.message.reply_text("Warninng in Statistics ⚠\nPlease, write /error") 
 
     counter_online = 0
     admin_counter = 0
@@ -529,10 +599,11 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
                 
             # Онлайн
             if user_time + fifteen_minutes >= now_time:
-                print("User_time:", user_time+fifteen_minutes)
-                print("Now:", now_time)
-                print(users_data[user_for]["main"] == "online")
-                counter_online += 1
+                if user_time - fifteen_minutes <= now_time:
+                    print("User_time:", user_time+fifteen_minutes)
+                    print("Now:", now_time)
+                    print(users_data[user_for]["main"] == "online")
+                    counter_online += 1
 
             # OFFLINE
             else:
@@ -551,12 +622,11 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
         print("User_time:", user_time+fifteen_minutes)
         print("Now:", now_time)
 
-    update.message.reply_text("Online: "+str(counter_online))
-    update.message.reply_text("Admins: "+str(admin_counter))
-
+    update.message.reply_text(emoji.emojize("Online: "+str(counter_online)+" :iphone:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Admins: "+str(admin_counter)+ "👨‍💻", language = 'alias'))
 
     # Добавить спрятанный текст
-    update.message.reply_text("Общее количество пользователей, зарегистрированных в Future Forest: "+str(len(users_data)))
+    update.message.reply_text(emoji.emojize("Общее количество пользователей, зарегистрированных в Future Forest: "+str(len(users_data))+" :busts_in_silhouette:", language = 'alias'))
 
 # Обработка фотографий
 def analyze_photo(update: Update, context: CallbackContext) -> None:
@@ -611,17 +681,20 @@ def ethernet_check(update: Update, context: CallbackContext) -> None:
     try:
         st = speedtest.Speedtest() 
 
-        update.message.reply_text("Немного подождите...\nВыполняется проверка интернета")
+        update.message.reply_text(emoji.emojize("Немного подождите...\nВыполняется проверка интернета :hourglass_flowing_sand:", language = 'alias'))
 
         #  Скачка
-        update.message.reply_text("Скорость скачивания:\n"+str(st.download())+" Mbit/s")
+        update.message.reply_text("Скорость скачивания: ⤵\n"+str(st.download())+" Mbit/s")
         #  Загрузка
-        update.message.reply_text("Скорость загрузки:\n"+str(st.upload())+" Mbit/s")
+        update.message.reply_text("Скорость загрузки: ⤴\n"+str(st.upload())+" Mbit/s")
         #  Пинг
         servernames =[]   
         st.get_servers(servernames)       
-        update.message.reply_text("Пинг:\n"+str(st.results.ping)+" ms")
+        update.message.reply_text("Пинг: 🌐\n"+str(st.results.ping)+" ms")
+    
     except Exception as _Ex:
+
+        update.message.reply_text("Warning in ETHERNET-CHECK ⚠\nPlease, write /error")
         update.message.reply_text(str(_Ex))
 
 def cute_url(update: Update, context: CallbackContext) -> None:
@@ -635,14 +708,14 @@ def cute_url(update: Update, context: CallbackContext) -> None:
             user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA")
+        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
 
     user_data["get_url"] = True
     user_data["main"] = "online"
 
     saving_data_of_user(user, user_data)
 
-    update.message.reply_text("Write Url:")
+    update.message.reply_text(emoji.emojize("Введите ссылку: :link:", language = 'alias'))
 
 def search_wiki(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
@@ -655,14 +728,14 @@ def search_wiki(update: Update, context: CallbackContext) -> None:
             user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA")
+        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
 
     user_data["get_sentence"] = True
     user_data["main"] = "online"
 
     saving_data_of_user(user, user_data)
 
-    update.message.reply_text("Write Request:")
+    update.message.reply_text("Введите запрос: ℹ")
 
 def qr_code(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
@@ -675,14 +748,47 @@ def qr_code(update: Update, context: CallbackContext) -> None:
             user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA")
+        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
 
     user_data["get_qr"] = True
     user_data["main"] = "online"
 
     saving_data_of_user(user, user_data)
 
-    update.message.reply_text("Write Something(url, sentence, contact...):")
+    update.message.reply_text("Введите что-либо: ссылку, предложение, контакт... 📝")
+
+def print_error(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+    add_online(user)
+
+    update.message.reply_text("В случае нахождения ошибок или неполадок в работе бота, просим писать модераторам группы Vk: ✍\nhttps://vk.com/only_number_one01")
+    # update.message.reply_text("\x1b]8;;https://vk.com/only_number_one01\aВ случае нахождения ошибок или неполадок в работе бота, просим писать модераторам группы\x1b]8;;\a")
+
+def print_info(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+    add_online(user)
+    
+    # What can this bot do?
+
+
+     
+    string = '''· Возможность общения с чат-ботом 💬\n
+· Получение погоды в любом городе ⛅\n 
+· Отправка рандомного стикера, а также его сохранение в базу данных 📝\n
+· Добавление пользователя в базу данных и показ его статистики и данных 🔐\n
+· Статистика всех зарегистрированных пользователей 👥\n
+· Создание более приятного url-адреса пользователя 📎\n
+· Отправка данных пользователя о его соединении с интернетом 🌐\n
+· Парсинг данных Википедии с целью ответа на запрос пользователя 🔎\n
+· Создание Qr-code при любом значении ✍\n
+
+· В случае обнаружения неполадок, существует возможность обратиться к модератору группы Vk ⚠
+            '''
+
+    update.message.reply_text("Функции Future Forest: 🌳")
+    update.message.reply_text(string)
+
+
 
 
 # Главная функция
@@ -692,22 +798,26 @@ def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Телеграмм токен
-    updater = Updater(tlgrm_tocken)
+    updater = Updater(tlgrm_tocken)  
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 # СЛЕШОВЫЕ команды
   
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("weather", weather))
-    dispatcher.add_handler(CommandHandler("smile", smile))
-    dispatcher.add_handler(CommandHandler("bio", print_bio))
-    dispatcher.add_handler(CommandHandler("statistics", print_statistics))    
-    dispatcher.add_handler(CommandHandler("url", cute_url))
-    dispatcher.add_handler(CommandHandler("ethernet", ethernet_check))    
+
+                #со смайлами (+)
+    dispatcher.add_handler(CommandHandler("start", start)) # + 
+    dispatcher.add_handler(CommandHandler("weather", weather)) # + 
+    dispatcher.add_handler(CommandHandler("smile", smile)) # +
+    dispatcher.add_handler(CommandHandler("bio", print_bio)) # +
+    dispatcher.add_handler(CommandHandler("statistics", print_statistics)) # +    
+    dispatcher.add_handler(CommandHandler("url", cute_url)) # + 
+    dispatcher.add_handler(CommandHandler("ethernet", ethernet_check)) # +    
     dispatcher.add_handler(CommandHandler("wiki", search_wiki))    
     dispatcher.add_handler(CommandHandler("qr", qr_code))    
+    dispatcher.add_handler(CommandHandler("error", print_error))    
+    dispatcher.add_handler(CommandHandler("info", print_info))    
         
     
 
@@ -730,3 +840,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from requests import request
 import telebot
 from unittest import result
 from deepface import DeepFace
@@ -277,5 +278,124 @@ def test_15():
     img.show()
 
     os.remove(filename)
+import wiki_search
+import re
+from random import *
 
-test_15()
+# request = wikipedia.summary("cat", sentences=2)
+# update.message.reply_text(request) 
+
+# request=re.sub('\([^()]*\)', '', request) 
+# request=re.sub('\([^()]*\)', '', request) 
+# request=re.sub('\{[^\{\}]*\}', '', request) 
+
+# list_requests = list(wikipedia.page.title[request])
+
+# print(list_requests[0])
+def test_16():
+    try:
+        p = wiki_search.page("cat")
+    except wiki_search.DisambiguationError as e:
+        s = choice(e.options)
+        p = wiki_search.page(s)
+
+    print(p)
+    print(p.summary)
+    # while True:
+    #     try:
+    #         request = wikipedia.summary("cat", sentences=2)
+    #         break
+
+    #     except wikipedia.exceptions.DisambiguationError as e: 
+    #         s = choice(e.options)
+    #         p = wikipedia.summary(s, sentences=2)
+
+    # print(p)
+
+    # Вычисляем длину
+    # url = len(wikipedia.page(request).images)
+
+    # print(url)
+import wikipedia
+
+def test_17(sentent):
+    while True:
+        try:
+            page = wikipedia.page(sentent)
+            break
+
+        except wikipedia.DisambiguationError as e:
+            chosen = choice(e.options)
+            page = wikipedia.page(chosen)
+            print("Слишком много страниц...\nРасскажу о "+str(page)) 
+            break
+    request = wiki_search.summary(page, sentences=2)         
+    print(str(request))
+
+    print(len(wiki_search.page(request).images))
+
+import wget
+import wiki_search
+def test_18():
+    responce = wiki_search.searching("car")
+    print(responce)
+
+def test_19():
+    request = wiki_search.searching("car", "en")
+    print(request)
+    # url_list = list()
+
+    if len(wikipedia.page(request).images) >= 0:
+        for i in range(len(wikipedia.page(request).images)):
+            url = wikipedia.page(request).images[i]
+            if "jpg" in url:
+                print(url)
+                break
+
+
+    url = wikipedia.page("money").images[0]
+    print(url)
+
+    filename = f"wiki.png"
+    wget.download(url, filename)
+
+    print()
+
+from urllib.request import urlopen   
+# test_19()
+# url = urlopen("https://upload.wikimedia.org/wikipedia/commons/0/0c/Black_Cat_%287983739954%29.jpg")
+# print(url)
+# filename = f"wiki{144}.jpg"
+# filename = wget.download("https://upload.wikimedia.org/wikipedia/commons/0/0c/Black_Cat_%287983739954%29.jpg")
+
+import emoji
+def test_20():
+    a = 3
+
+    if a == 1:
+        emodzy = ':v:'
+    else:
+        emodzy = ':house_with_garden:'
+    print (emoji.emojize(f"Python is {emodzy}",  language = 'alias' )) 
+    print(emoji.emojize("Чтобы заработать Intent-ы переходи сюда:(url...) ®", language = 'alias'))
+
+    print("\x1b]8;;http://example.com/\aCtrl+Click here\x1b]8;;\a")
+
+
+str = '''
+· Возможность общения с чат-ботом 💬
+· Получение погоды в любом городе ⛅ 
+· Мобильная работа с базами данных 📝
+· Создание более приятного url-адреса пользователя 📎
+· Отправка данных пользователя о его соединении с интернетом 🌐
+· Парсинг данных Википедии с целью ответа на запрос пользователя 🔎
+· Создание Qr-code при любом введенном значении пользователя ✍
+
+· В случае обнаружения неполадок, существует возможность обратиться к модератору группы Vk ⚠
+
+        '''
+print(len(str))
+
+print(len(". В случае обнаружения неполадок, существует возможность обратиться к модератору группы Vk ⚠"))
+
+
