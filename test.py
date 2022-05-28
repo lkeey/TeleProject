@@ -398,4 +398,95 @@ print(len(str))
 
 print(len(". В случае обнаружения неполадок, существует возможность обратиться к модератору группы Vk ⚠"))
 
+import array as arr
+def test_21():
+    with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
+        # Весь
+        data_all_users = json.load(file)
+        users_data = data_all_users["users"]
 
+    points_list = list()
+
+    dict_users = {
+        # user: points
+    }
+
+    for user in users_data: 
+        dict_users[users_data[user]["username"]] = users_data[user]["points"]
+        points_list.append(users_data[user]["points"])
+
+    # 1-ое
+    first_place = max(points_list)
+    points_list.remove(first_place)
+
+    # 2-ое
+    second_place = max(points_list)
+    points_list.remove(second_place)
+
+    # 3-ье
+    third_place = max(points_list)
+    
+    top_place = list()
+    # 1st place
+    for user in dict_users:
+        if dict_users[user] == first_place:
+            name_1st = user
+            
+            top_place.append(name_1st)
+
+            del dict_users[user]
+            break
+
+    for user in dict_users:
+        if dict_users[user] == second_place:
+            name_2nd = user
+            top_place.append(name_2nd)
+
+            del dict_users[user]
+            break
+
+    for user in dict_users:
+        if dict_users[user] == third_place:
+            name_3rd = user
+            top_place.append(name_3rd)
+
+            del dict_users[user]
+            break
+
+    return top_place
+
+def test_22(amount):
+    with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
+        # Весь
+        data_all_users = json.load(file)
+        users_data = data_all_users["users"]
+
+    points_list = list()
+
+    dict_users = {
+        # user: points
+    }
+
+    for user in users_data: 
+        dict_users[users_data[user]["username"]] = users_data[user]["points"]
+        points_list.append(users_data[user]["points"])
+
+    top_place = list()
+
+    for i in range(amount):
+        # Наивысшее место
+        the_most_place = max(points_list)
+        points_list.remove(the_most_place)
+
+        for user in dict_users:
+            if dict_users[user] == the_most_place:
+                name_1st = user
+                
+                top_place.append(name_1st)
+
+                del dict_users[user]
+                break
+    return top_place    
+
+print(test_21())
+print(test_22(1))

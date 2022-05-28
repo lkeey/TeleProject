@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MAIN PAGE</title>
+</head>
+<body>
+    <h2>MESSAGES</h2>
+    
+    <!-- всегда выполняется показ сообщений  -->
+    <form method="post" action="/add_message">
+
+    <!-- создание ячеек ввода -->
+        <input type="text" name="text">
+        <input type="text" name="tag">
+
+    <!-- кнопка отправки -->
+        <button type="submit">Add Message</button>
+
+    </form>
+
+<h3>Messages LIST</h3>
+
+<!-- цикл для каждого сообщения -->
+{% for message in messages %}
+
+    <!-- показывается на экране -->
+    <div>{{ message.text }}&nbsp;<i>#{{ message.tag }}</i></div>
+
+    <!-- конец цикла -->
+{% endfor%}
+
+</body>
+</html>
