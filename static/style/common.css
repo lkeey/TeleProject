@@ -1,0 +1,75 @@
+.items{
+    border-radius: 20px;
+    box-shadow: 10px 5px 5px 5px rgba(36, 36, 40, 0.2);  
+}
+
+.nav-items {
+    border-radius: 20px;
+}
+
+.container {
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    margin: 0%;
+    position: relative;  
+}
+
+.canvas {
+    display: block;
+    background: hsl(10, 90%, 50%);
+}
+
+html {
+    scroll-behavior: smooth;
+  }
+
+.all { 
+    position: absolute;
+    top: 5px;
+    left: 5%;
+    right: 5%;
+  }
+
+.top {
+    border: 2px solid white;
+    border-radius: 15px;
+    margin-top: 30px;
+    padding: 20px 50px;
+    max-width: max-content;
+}
+
+#graph.graph{
+    border: 1px solid #77FF5C;
+    padding: 5px;
+  }
+  #graph .item{
+    margin: 20px;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    padding: 3px;
+    border-radius: 3px;  
+    background-color: #0ee4c4;
+    box-shadow: 0 0 10px #2280AC;
+  }
+  #graph .item:hover{
+    background-color: #fbff07;  
+    box-shadow: 2px 2px 30px 10px rgba(0, 0, 255, .2);
+  }
+
+#graph.vertical{
+    height: 150px;
+    min-width: min-content;
+    padding: 20px 40px;
+   }
+   
+#graph.vertical .item{
+    width: 50px;  
+    float: left;
+    display: inline-block;
+}

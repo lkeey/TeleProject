@@ -85,6 +85,7 @@ def saving_data_of_user(user, data):
     data_all_users["users"][str(user["id"])]["get_url"] = data["get_url"]
     data_all_users["users"][str(user["id"])]["get_sentence"] = data["get_sentence"]
     data_all_users["users"][str(user["id"])]["get_qr"] = data["get_qr"]
+    data_all_users["users"][str(user["id"])]["city"] = data["city"]
 
     try:
         with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
@@ -267,8 +268,6 @@ def echo(update: Update, context: CallbackContext) -> None:
     get_qr = user_data["get_qr"] 
     print("GET_QR:", get_qr)
 
-
-
     print(1, not get_weather and not get_url and not get_sentence and not get_qr)
     print(2, get_weather and not get_url and not get_sentence and not get_qr)
     print(3, get_url and not get_weather and not get_sentence and not get_qr)
@@ -281,6 +280,9 @@ def echo(update: Update, context: CallbackContext) -> None:
         input_text = update.message.text
         reply = bot(input_text)
         update.message.reply_text(reply)
+
+        user_data["main"] = "online"
+        saving_data_of_user(user, user_data)
 
     elif get_weather and not get_url and not get_sentence and not get_qr:
         rate_weather = user_data["rate_weather"] 
@@ -571,6 +573,8 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     
 def print_statistics(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
+    add_online(user)
+    
     try:
         with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             data_all_users = json.load(file)

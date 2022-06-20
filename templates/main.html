@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %} Main Page {% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <hr>
+    <div class="container top shadow-lg">
+        
+        <h3 class="text-center">TOP</h3>
+
+        {% for i in range(top_users|length) %}
+
+            <p><b>{{ i + 1 }}</b>&nbsp;<i>#{{ top_users[i] }}</i></p>
+        
+        {% endfor%}
+        
+    </div>
+    
+
+    <h1>В телеграмм боте при получении сообщения заносим его в Data-Amount(обязательно заносить в определенный месяц), в html открываем словарь и передаем в файл, в котром длину столбца умножаем на количество пользователей </h1>  
+
+    <div id="graph" class="container top shadow-lg graph vertical">
+        <div class="item" style="height:20px;margin-top:90px">10</div>
+        <div class="item" style="height:45px;margin-top:65px">25</div>
+        <div class="item" style="height:60px;margin-top:50px">30</div>
+        <div class="item" style="height:100px;margin-top:10px">100</div>
+    </div>
+
+</div>
+
+
+{% endblock %}

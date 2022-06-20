@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>TeleSite</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for( 'static', filename='log_in/css_log_in/style.css', v=1)}}">
-</head>
-<body> 
-    <img src="img/background.jpg" class="background" />
-    
+
+{% extends "base.html" %}
+
+{% block title %} Create Page {% endblock %}
+
+{% block body %}  
+
     <div class="name">
         <h1 id="name_site">Future Forest</h1> 
     </div>
@@ -25,7 +22,7 @@
 
     {% endfor %}   
 
-    <form method="post" action="/send_intent">
+    <form method="post" method="post">
         <div class="form">
             <h1>intent</h1>
             <!-- Интерфейс: имя, окно чата, текст сообщения -->
@@ -49,16 +46,10 @@
     </form>
 <!-- top_users -->
 <!-- amount_place -->
-    <div class="top">
-        <h1>TOP</h1>
+<script src="{{ url_for('static', filename='script/background.js') }}"></script> 
 
-        {% for i in range(amount_place) %}
-
-            <div>{{ i + 1 }}&nbsp;<i>#{{ top_users[i] }}</i></div>
-        
-            {% endfor%}
-        
-    </div>
     
 </body>
 </html>
+
+{% endblock %}
