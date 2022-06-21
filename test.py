@@ -488,5 +488,39 @@ def test_22(amount):
                 break
     return top_place    
 
-print(test_21())
-print(test_22(1))
+
+def amount_data():
+    data = {}
+    data["months"] = {}
+
+    for i in range(4):
+        # data["months"] = [i+9]
+        data["months"][i+9] = {}
+        data["months"][i+9]["users"] = 0
+        data["months"][i+9]["messages"] = 0
+        data["months"][i+9]["intents"] = 0
+
+    print(data)
+
+    with open('Data-Bases/Data-Amount.json', 'w', encoding='utf-8') as file:
+        
+        json.dump(data, file, sort_keys = True)
+
+amount_data()
+
+with open('Data-Bases/Data-Amount.json', 'r', encoding='utf-8') as file:
+    data_amount = json.load(file)["months"]
+ 
+    for month in data_amount:
+        print(f"{month} - {data_amount[month]['users']} users - {data_amount[month]['messages']} messages - {data_amount[month]['intents']} intents")
+
+
+with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+        data = {
+            f'{datetime.now().strftime("%d")}': {
+                "messages": 0,
+                "intents": 0,
+                "users": 0,
+            }
+        }
+        json.dump(data, file, sort_keys = True)

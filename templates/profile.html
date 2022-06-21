@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %} Profile Page {% endblock %}
+
+{% block body %}
+
+
+<div class="row">
+<br>
+    <div class="col">
+        
+        <div class="container top shadow-lg">
+            <p><b>Id</b>&nbsp;{{ data_user["id"] }}</p>
+            <p><b>First Name</b>&nbsp;{{ data_user["first_name"] }}</p>
+            <p><b>Last Name</b>&nbsp;{{ data_user["last_name"] }}</p>  
+            <p><b>Main</b>&nbsp;{{ data_user["main"] }}</p>
+            <p><b>Post</b>&nbsp;{{ data_user["post"] }}</p>
+            <p><b>Points</b>&nbsp;{{ data_user["points"] }}</p>
+            <p><b>Place</b>&nbsp;{{ place_num }}</p>
+            <p><b>Was Registered</b>&nbsp;{{ data_user["registered"] }}</p>
+            <p><b>Was Online</b>&nbsp;{{ data_user["was_online"] }}</p>
+
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="container">
+            
+            <div class="container top shadow-lg">
+                
+                <h3 class="text-center">TOP</h3>
+
+                {% for i in range(top_user|length) %}
+
+                    <p><b>{{ i + 1 }}</b>&nbsp;<i>#{{ top_user[i] }}</i></p>
+                
+                {% endfor%}
+                
+            </div>
+        </div>
+
+        <div class="col">
+            <br>
+            <div class="container">
+            
+                <div class="container top shadow-lg">
+                    
+                    <h3 class="text-center">DAY-DATA</h3>
+
+                    <p style="display: inline;"><b>MESSAGES</b>&nbsp;{{current_data["messages"]}}</p>
+                    <img src="{{ url_for('static', filename='img/uparrow_78484.png') }}" width="15px" height="15px" alt="NONE"><hr>
+
+                    <p style="display: inline;"><b>USERS</b>&nbsp;{{current_data["users"]}}</p>
+                    <img src="{{ url_for('static', filename='img/arrowdown_flech_1539.png') }}" width="15px" height="15px" alt="NONE"><hr>
+                    
+                    <p style="display: inline;"><b>INTENTS</b>&nbsp;{{current_data["intents"]}}</p>
+                    <img src="{{ url_for('static', filename='img/calculate_equals_icon_194844.png') }}" width="15px" height="15px" alt="NONE"><hr>
+
+        </div>
+    </div>
+
+{% endblock %}

@@ -5,48 +5,24 @@
 
 {% block body %}  
 
-    <div class="name">
-        <h1 id="name_site">Future Forest</h1> 
+    <div class="container">
+        <br>
+        <h1>Add New Intents</h1>
+        <hr>
+
+
+        <form method="post">
+            <div class="form intent-form container">
+                <input id="topic" class="form-control" name="topic" type="text" placeholder="Topic"/><br>
+                <input id="answer" class="form-control" name="example" type="text" placeholder="Answer"/><br>
+                <input id="responce" class="form-control" name="responce" type="text" placeholder="Responce"><br>
+                <input type="submit" class="btn btn-public btn-default" value="Send"><br>      
+            </div>
+            
+        </form>
+        
     </div>
-    
-        <!-- data_user -->
-    
-        <!-- <div class="form-profile"> 
-            <h2>Name: <i>{{ data_user["name"] }}</i></h2>
-            <h3>Points: <i>{{ data_user["points"] }}</i></h3>
-            <h3>Top Place: <i>0</i></h3>
-        </div> -->
-    {% for data in data_user %}
-
-        <div>{{ data }}&nbsp;<i>#{{ data_user[data] }}</i></div>
-
-    {% endfor %}   
-
-    <form method="post" method="post">
-        <div class="form">
-            <h1>intent</h1>
-            <!-- Интерфейс: имя, окно чата, текст сообщения -->
-            <div class="input-form">
-                <input id="topic" name="topic" type="text" placeholder="Topic"/>
-            </div>
-
-            <div class="input-form">
-                <input id="answer" name="example" type="text" placeholder="Answer"/>
-            </div>
-
-            <div class="input-form">
-                <input id="responce" name="responce" type="text" placeholder="Responce">
-            </div>
-
-            <div class="input-form">
-                <input type="submit" value="Send">
-            </div>
-
-        </div>
-    </form>
-<!-- top_users -->
-<!-- amount_place -->
-<script src="{{ url_for('static', filename='script/background.js') }}"></script> 
+<script src="{{ url_for('static', filename='script/pattern.js') }}"></script> 
 
     
 </body>

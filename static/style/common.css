@@ -56,14 +56,17 @@ html {
     border-radius: 3px;  
     background-color: #0ee4c4;
     box-shadow: 0 0 10px #2280AC;
+    transition: 0.5s; 
+    display: block;
   }
   #graph .item:hover{
-    background-color: #fbff07;  
-    box-shadow: 2px 2px 30px 10px rgba(0, 0, 255, .2);
+    background-color: #07deff;  
+    box-shadow: 5px 5px 30px 15px rgba(0, 0, 255, .2);
+    transform: scale(1.2);
   }
 
 #graph.vertical{
-    height: 150px;
+    height: 300px;
     min-width: min-content;
     padding: 20px 40px;
    }
@@ -72,4 +75,24 @@ html {
     width: 50px;  
     float: left;
     display: inline-block;
+}
+
+.intent-form {
+  border: 2px solid white;
+  box-shadow: 3px 3px 50px rgb(255, 255, 255);
+  border-radius: 15px;
+  margin-top: 60px;
+  padding: 40px 70px;
+  max-width: max-content;
+  height: auto;
+}
+
+.btn-public {
+  border-radius: 20px;
+  background-color: rgb(255, 255, 255);
+}
+
+.img-p {
+  height: 15px;
+  width: 15px;
 }

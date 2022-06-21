@@ -6,26 +6,34 @@
 
 <div class="container">
     <hr>
-    <div class="container top shadow-lg">
-        
-        <h3 class="text-center">TOP</h3>
-
-        {% for i in range(top_users|length) %}
-
-            <p><b>{{ i + 1 }}</b>&nbsp;<i>#{{ top_users[i] }}</i></p>
-        
-        {% endfor%}
-        
-    </div>
+    
+    <div class="row">
+        <div class="col">
+            <div id="graph" class="container top shadow-lg graph vertical">
+                <h3 class="text-center">MESSAGES</h3>
+                {% for month in data_month %}
+                    <div class="item" style="height:{{ data_month[month]['messages']*0.1 }}px;margin-top:{{ 200 - data_month[month]['messages']*0.1 }}px">{{data_month[month]['messages']}}</div>
+                {% endfor %}
+            </div>
+        </div>
     
 
-    <h1>В телеграмм боте при получении сообщения заносим его в Data-Amount(обязательно заносить в определенный месяц), в html открываем словарь и передаем в файл, в котром длину столбца умножаем на количество пользователей </h1>  
+    
+        <div class="col">
+            <div id="graph" class="container top shadow-lg graph vertical" style="min-height: fit-content;">
+                <h3 class="text-center">USERS</h3>
+                {% for month in data_month %}
+                <div class="item" style="height:{{ data_month[month]['users'] }}px;margin-top:{{ 200 - data_month[month]['users'] }}px">{{data_month[month]['users']}}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
-    <div id="graph" class="container top shadow-lg graph vertical">
-        <div class="item" style="height:20px;margin-top:90px">10</div>
-        <div class="item" style="height:45px;margin-top:65px">25</div>
-        <div class="item" style="height:60px;margin-top:50px">30</div>
-        <div class="item" style="height:100px;margin-top:10px">100</div>
+    <div id="graph" class="container top shadow-lg graph vertical" style="min-height: fit-content;">
+        <h3 class="text-center">INTENTS</h3>
+        {% for month in data_month %}
+        <div class="item" style="height:{{ data_month[month]['intents']*0.5 }}px;margin-top:{{ 200 - data_month[month]['intents']*0.5 }}px">{{data_month[month]['intents']}}</div>
+        {% endfor %}
     </div>
 
 </div>
