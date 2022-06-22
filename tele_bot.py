@@ -96,6 +96,37 @@ def saving_data_of_user(user, data):
     except:
         print("НЕ ОТКРЫВАЕТСЯ")
 
+def add_message(amount):
+    # В словарь DAY
+    try:
+        with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
+            data_day = json.load(file)
+            if f'{datetime.now().strftime("%m%d")}' not in data_day:
+                data_day[f'{datetime.now().strftime("%m%d")}'] = {}
+                data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
+                data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
+                data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+
+            data_day[f'{datetime.now().strftime("%m%d")}']["messages"] += amount
+                
+        with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+            json.dump(data_day, file, sort_keys = True)
+
+        # В словарь AMOUNT
+        with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+            data_day = json.load(file)["months"]
+            print("Month", datetime.now().strftime("%m"))
+            print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+            
+            data_day[f'{datetime.now().strftime("%m")}']["messages"] += 3
+
+        with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
+            data = {"months": data_day}
+            
+            json.dump(data, file, sort_keys = True)
+    except Exception as _Ex:
+        print("Warning in Add_Message\n", _Ex)
+
 def add_online(user):
     # Открытие словаря
     try:
@@ -199,8 +230,38 @@ def start(update: Update, context: CallbackContext) -> None:
                         "users": data_all_users
                         }
                 json.dump(data, file, sort_keys = True)
-        except:
+
+            # Добавление в словарь DAY
+
+            with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
+                data_day = json.load(file)
+                if f'{datetime.now().strftime("%m%d")}' not in data_day:
+                    data_day[f'{datetime.now().strftime("%m%d")}'] = {}
+                    data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
+                    data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
+                    data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+
+                data_day[f'{datetime.now().strftime("%m%d")}']["users"] += 1
+                           
+            with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+                json.dump(data_day, file, sort_keys = True)
+
+            # В словарь AMOUNT
+            with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+                data_day = json.load(file)["months"]
+                print("Month", datetime.now().strftime("%m"))
+                print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+                
+                data_day[f'{datetime.now().strftime("%m")}']["users"] += 1
+
+            with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
+                data = {"months": data_day}
+                
+                json.dump(data, file, sort_keys = True)
+
+        except Exception as _Ex:
             update.message.reply_text(emoji.emojize("Warning in open data-user :warning:\nPlease, write /error", language = 'alias' ))
+            print("Warning", _Ex)
 
         update.message.reply_text(emoji.emojize("Вы были успешно зарегистрированы! :globe_with_meridians:", language = 'alias' ))
     else:
@@ -276,7 +337,8 @@ def echo(update: Update, context: CallbackContext) -> None:
 
     """Echo the user message."""
     if not get_weather and not get_url and not get_sentence and not get_qr:
-        
+        add_message(1)
+
         input_text = update.message.text
         reply = bot(input_text)
         update.message.reply_text(reply)
@@ -285,6 +347,8 @@ def echo(update: Update, context: CallbackContext) -> None:
         saving_data_of_user(user, user_data)
 
     elif get_weather and not get_url and not get_sentence and not get_qr:
+        add_message(1)
+
         rate_weather = user_data["rate_weather"] 
         print("rate_weather", rate_weather)
 
@@ -373,6 +437,8 @@ def echo(update: Update, context: CallbackContext) -> None:
                 update.message.reply_text(str(ex))
 
     elif get_url and not get_weather and not get_sentence and not get_qr:
+        add_message(1)
+
         url = update.message.text
         try:
 
@@ -397,6 +463,8 @@ def echo(update: Update, context: CallbackContext) -> None:
         # print("GET_URL:", get_url)
     
     elif get_sentence and not get_url and not get_weather and not get_qr:
+        add_message(1)
+
         sentence = update.message.text
  
         update.message.reply_text("Выполняю поиск по Wikipedia 🔎\nПожалуйста, подождите...") 
@@ -459,6 +527,8 @@ def echo(update: Update, context: CallbackContext) -> None:
         saving_data_of_user(user, user_data)
 
     elif get_qr and not get_weather and not get_url and not get_sentence:
+        add_message(1)
+
         smth = sentence = update.message.text
         try:
             filename = f"qrcode{id}.png"
@@ -491,6 +561,8 @@ def echo(update: Update, context: CallbackContext) -> None:
             update.message.reply_text(str(_Ex))
        
 def weather(update: Update, context: CallbackContext) -> None:
+    add_message(3)
+
     user = update.effective_user
 
     # Открытие словаря
@@ -512,6 +584,8 @@ def weather(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(emoji.emojize("Введите город: :house:",language = 'alias'))
 
 def smile(update: Update, context: CallbackContext) -> None:
+    add_message(2)
+
     user = update.effective_user
     add_online(user)
     
@@ -524,6 +598,8 @@ def smile(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(emoji.emojize("У меня очень мало стикеров(( Пришли мне пару своих..) :relaxed:\nЛишь "+str(len(all_smiles))+" стикера(-ов)", language = 'alias'))
 
 def new_smile(update: Update, context: CallbackContext) -> None:
+    add_message(2)
+
     user = update.effective_user
     add_online(user)
 
@@ -545,6 +621,8 @@ def new_smile(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Твой стик был успешно добавлен...) 😊")
 
 def print_bio(update: Update, context: CallbackContext) -> None:
+    add_message(3)
+
     user = update.effective_user
     add_online(user)
     
@@ -572,6 +650,8 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(emoji.emojize("Чтобы заработать Intent-ы переходи сюда:(url...) :link:", language = 'alias'))
     
 def print_statistics(update: Update, context: CallbackContext) -> None:
+    add_message(3)
+
     user = update.effective_user
     add_online(user)
     
@@ -636,6 +716,8 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
 
 # Обработка фотографий
 def analyze_photo(update: Update, context: CallbackContext) -> None:
+    add_message(1)
+
     user = update.effective_user
     add_online(user)
     
@@ -681,6 +763,8 @@ def analyze_photo(update: Update, context: CallbackContext) -> None:
 
 # Проверка интернета
 def ethernet_check(update: Update, context: CallbackContext) -> None:
+    add_message(4)
+
     user = update.effective_user
     add_online(user)
     
@@ -705,6 +789,7 @@ def ethernet_check(update: Update, context: CallbackContext) -> None:
 
 def cute_url(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
+    add_message(2)
 
     # Открытие словаря
     try:
@@ -724,6 +809,8 @@ def cute_url(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(emoji.emojize("Введите ссылку: :link:", language = 'alias'))
 
 def search_wiki(update: Update, context: CallbackContext) -> None:
+    add_message(3)
+
     user = update.effective_user
 
     # Открытие словаря
@@ -744,6 +831,7 @@ def search_wiki(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Введите запрос: ℹ")
 
 def qr_code(update: Update, context: CallbackContext) -> None:
+    add_message(1)
     user = update.effective_user
 
     # Открытие словаря
@@ -764,6 +852,7 @@ def qr_code(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Введите что-либо: ссылку, предложение, контакт... 📝")
 
 def print_error(update: Update, context: CallbackContext) -> None:
+    add_message(2)
     user = update.effective_user
     add_online(user)
 
@@ -773,6 +862,7 @@ def print_error(update: Update, context: CallbackContext) -> None:
 def print_info(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     add_online(user)
+    add_message(3)
     
     # What can this bot do?
 

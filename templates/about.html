@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %} About Page {% endblock %}
+
+{% block ico %}
+type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename='img/info_about_information_icon_132735.png') }}"
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-5 top shadow-lg container">
+        
+        <br>
+        <p style="display: inline;"><b>MESSAGES</b>&nbsp;{{current_data["messages"]}}</p>
+        <img src="{{ url_for('static', filename='img/uparrow_78484.png') }}" width="15px" height="15px" alt="NONE"><hr>
+
+        <p style="display: inline;"><b>USERS</b>&nbsp;{{current_data["users"]}}</p>
+        <img src="{{ url_for('static', filename='img/arrowdown_flech_1539.png') }}" width="15px" height="15px" alt="NONE"><hr>
+        
+        <p style="display: inline;"><b>INTENTS</b>&nbsp;{{current_data["intents"]}}</p>
+        <img src="{{ url_for('static', filename='img/calculate_equals_icon_194844.png') }}" width="15px" height="15px" alt="NONE"><hr>
+        <br>
+
+    </div>
+    <div class="col-4 top shadow-lg container">
+        <div><h3 class="no-enter">Registered Users</h3>&nbsp;{{amount_users}}</div>
+        <br><p><b>Registered Users</b>&nbsp;{{amount_users}}people</p>
+        <br><p><b>Sent Messages</b>&nbsp;{{amount_messages}}</p>
+        <br><p><b>Added Intents</b>&nbsp;{{amount_intents}}</p>
+    </div>
+    
+</div>
+{% endblock %}

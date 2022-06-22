@@ -195,8 +195,8 @@ def form(id=0):
                     name_topic = f"{str(id)}_{str(user_data[str(id)]['points'])}"
 
                     data_intents[name_topic] = {}
-                    data_intents[name_topic]["examples"] = example.split("/")
-                    data_intents[name_topic]["responses"] = responce.split("/")
+                    data_intents[name_topic]["examples"] = example
+                    data_intents[name_topic]["responses"] = responce
 
                     print(data_intents[name_topic])
 
@@ -205,6 +205,36 @@ def form(id=0):
                         data = {
                                 "intents": data_intents
                                 }
+                        json.dump(data, file, sort_keys = True)
+
+
+                    # Добавление интентов за день
+                    
+                    print("Add Intent Count")
+                    with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
+                        data_day = json.load(file)
+                        if f'{datetime.now().strftime("%m%d")}' not in data_day:
+                            data_day[f'{datetime.now().strftime("%m%d")}'] = {}
+                            data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
+                            data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
+                            data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+
+                        data_day[f'{datetime.now().strftime("%m%d")}']["intents"] += 3
+                           
+                    with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+                        json.dump(data_day, file, sort_keys = True)
+
+                    # Добавление интента в data-amount
+                    with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+                        data_day = json.load(file)["months"]
+                        print("Month", datetime.now().strftime("%m"))
+                        print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+                        
+                        data_day[f'{datetime.now().strftime("%m")}']["intents"] += 3
+
+                    with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
+                        data = {"months": data_day}
+                        
                         json.dump(data, file, sort_keys = True)
 
                     print("END INTENT")
@@ -251,15 +281,47 @@ def show_profile(id=0):
         if user == users_data[str(id)]["username"]:
             place = counter
 
+    
+
+    return render_template("profile.html",id=id, data_user=data, top_user=top_user, place_num=place)
+
+
+@app.route("//about", methods=["GET","POST"])
+@app.route("/<int:id>/about", methods=["GET"])
+def show_about(id=0):
     with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
         # Весь
         data_day = json.load(file)
-        current_data = data_day[f'{datetime.now().strftime("%d")}']
-        yesterday_data = data_day[f'{int(datetime.now().strftime("%d"))-1}']
+
+        # Даты нет в словаре
+        if f'{datetime.now().strftime("%m%d")}' not in data_day:
+            data_day[f'{datetime.now().strftime("%m%d")}'] = {}
+            data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
+            data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
+            data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+
+            with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+                json.dump(data_day, file, sort_keys = True)
+
+        current_data = data_day[f'{datetime.now().strftime("%m%d")}']
+
+        yesterday_data = data_day[f'{datetime.now().strftime("%m")+str(int(datetime.now().strftime("%d"))-1)}']
         print("data_day", current_data)
         print("yestaerday_data", yesterday_data)
 
-    return render_template("profile.html",current_data=current_data, yesterday_data=yesterday_data ,id=id, data_user=data, top_user=top_user, place_num=place)
+    with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+        amount_users = 0
+        amount_messages = 0
+        amount_intents = 0
+
+        data_months = json.load(file)["months"]
+
+        for month in data_months:
+            amount_users += data_months[month]["users"]
+            amount_messages += data_months[month]["messages"]
+            amount_intents += data_months[month]["intents"]
+
+    return render_template("about.html", id=id, amount_intents=amount_intents, amount_users=amount_users, amount_messages=amount_messages, current_data=current_data, yesterday_data=yesterday_data )
 
 if __name__ == '__main__':
       app.run(debug=True)

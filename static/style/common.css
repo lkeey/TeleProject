@@ -41,7 +41,7 @@ html {
     border-radius: 15px;
     margin-top: 30px;
     padding: 20px 50px;
-    max-width: max-content;
+    
 }
 
 #graph.graph{
@@ -59,7 +59,14 @@ html {
     transition: 0.5s; 
     display: block;
   }
+
   #graph .item:hover{
+    background-color: #07deff;  
+    box-shadow: 5px 5px 30px 15px rgba(0, 0, 255, .2);
+    transform: scale(1.2);
+  }
+
+  #graph .item:active{
     background-color: #07deff;  
     box-shadow: 5px 5px 30px 15px rgba(0, 0, 255, .2);
     transform: scale(1.2);
@@ -83,8 +90,8 @@ html {
   border-radius: 15px;
   margin-top: 60px;
   padding: 40px 70px;
-  max-width: max-content;
-  height: auto;
+  
+  
 }
 
 .btn-public {
@@ -95,4 +102,8 @@ html {
 .img-p {
   height: 15px;
   width: 15px;
+}
+
+.no-enter {
+  display: inline;
 }

@@ -2,14 +2,20 @@
 
 {% block title %} Profile Page {% endblock %}
 
+{% block ico %}
+type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename='img/user-profile_icon-icons.com_71302.png') }}"
+{% endblock %}
+
 {% block body %}
 
 
 <div class="row">
 <br>
-    <div class="col">
+    <div class="col-7">
         
         <div class="container top shadow-lg">
+            
+            <h3>{{ data_user["username"] }}</h3><hr>
             <p><b>Id</b>&nbsp;{{ data_user["id"] }}</p>
             <p><b>First Name</b>&nbsp;{{ data_user["first_name"] }}</p>
             <p><b>Last Name</b>&nbsp;{{ data_user["last_name"] }}</p>  
@@ -23,13 +29,13 @@
         </div>
     </div>
 
-    <div class="col">
+    <div class="col-5">
         <div class="container">
             
             <div class="container top shadow-lg">
                 
                 <h3 class="text-center">TOP</h3>
-
+                <hr>
                 {% for i in range(top_user|length) %}
 
                     <p><b>{{ i + 1 }}</b>&nbsp;<i>#{{ top_user[i] }}</i></p>
@@ -38,25 +44,10 @@
                 
             </div>
         </div>
+    
 
-        <div class="col">
-            <br>
-            <div class="container">
-            
-                <div class="container top shadow-lg">
-                    
-                    <h3 class="text-center">DAY-DATA</h3>
-
-                    <p style="display: inline;"><b>MESSAGES</b>&nbsp;{{current_data["messages"]}}</p>
-                    <img src="{{ url_for('static', filename='img/uparrow_78484.png') }}" width="15px" height="15px" alt="NONE"><hr>
-
-                    <p style="display: inline;"><b>USERS</b>&nbsp;{{current_data["users"]}}</p>
-                    <img src="{{ url_for('static', filename='img/arrowdown_flech_1539.png') }}" width="15px" height="15px" alt="NONE"><hr>
-                    
-                    <p style="display: inline;"><b>INTENTS</b>&nbsp;{{current_data["intents"]}}</p>
-                    <img src="{{ url_for('static', filename='img/calculate_equals_icon_194844.png') }}" width="15px" height="15px" alt="NONE"><hr>
-
-        </div>
+        <br>
+        
     </div>
-
+    
 {% endblock %}

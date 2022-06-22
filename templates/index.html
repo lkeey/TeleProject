@@ -3,6 +3,10 @@
 
 {% block title %} Create Page {% endblock %}
 
+{% block ico %}
+type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename='img/add_circle_create_expand_new_plus_icon_123218.png') }}"
+{% endblock %}
+
 {% block body %}  
 
     <div class="container">
@@ -10,17 +14,17 @@
         <h1>Add New Intents</h1>
         <hr>
 
-
-        <form method="post">
-            <div class="form intent-form container">
-                <input id="topic" class="form-control" name="topic" type="text" placeholder="Topic"/><br>
-                <input id="answer" class="form-control" name="example" type="text" placeholder="Answer"/><br>
-                <input id="responce" class="form-control" name="responce" type="text" placeholder="Responce"><br>
-                <input type="submit" class="btn btn-public btn-default" value="Send"><br>      
-            </div>
-            
-        </form>
-        
+        <div class="row">
+            <form method="post">
+                <div class="form intent-form container col-7">
+                    <input id="topic" class="form-control" name="topic" type="text" placeholder="Topic"/><br>
+                    <input id="answer" class="form-control" name="example" type="text" placeholder="Answer"/><br>
+                    <input id="responce" class="form-control" name="responce" type="text" placeholder="Responce"><br>
+                    <input type="submit" class="btn btn-public btn-default" value="Send"><br>      
+                </div>
+                
+            </form>
+        </div>
     </div>
 <script src="{{ url_for('static', filename='script/pattern.js') }}"></script> 
 

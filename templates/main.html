@@ -2,38 +2,45 @@
 
 {% block title %} Main Page {% endblock %}
 
+{% block ico %}
+type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename='img/3643769-building-home-house-main-menu-start_113416.png') }}"
+{% endblock %}
+
 {% block body %}
+
 
 <div class="container">
     <hr>
     
     <div class="row">
-        <div class="col">
-            <div id="graph" class="container top shadow-lg graph vertical">
+        
+            <div id="graph" class="container top shadow-lg graph vertical col-5">
                 <h3 class="text-center">MESSAGES</h3>
-                {% for month in data_month %}
-                    <div class="item" style="height:{{ data_month[month]['messages']*0.1 }}px;margin-top:{{ 200 - data_month[month]['messages']*0.1 }}px">{{data_month[month]['messages']}}</div>
-                {% endfor %}
+                <div class="row">
+                    {% for month in data_month %}
+                        <div class="item col" style="height:{{ data_month[month]['messages']*0.1 }}px;margin-top:{{ 200 - data_month[month]['messages']*0.1 }}px">{{data_month[month]['messages']}}</div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    
 
-    
-        <div class="col">
-            <div id="graph" class="container top shadow-lg graph vertical" style="min-height: fit-content;">
+            <div id="graph" class="container top shadow-lg graph vertical col-5" style="min-height: fit-content;">
                 <h3 class="text-center">USERS</h3>
-                {% for month in data_month %}
-                <div class="item" style="height:{{ data_month[month]['users'] }}px;margin-top:{{ 200 - data_month[month]['users'] }}px">{{data_month[month]['users']}}</div>
-                {% endfor %}
+                <div class="row">
+                    {% for month in data_month %}
+                        <div class="item col" style="height:{{ data_month[month]['users'] }}px;margin-top:{{ 200 - data_month[month]['users'] }}px">{{data_month[month]['users']}}</div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
+        
     </div>
 
-    <div id="graph" class="container top shadow-lg graph vertical" style="min-height: fit-content;">
+    <div id="graph" class="container top shadow-lg graph vertical col-5" style="min-height: fit-content;">
         <h3 class="text-center">INTENTS</h3>
-        {% for month in data_month %}
-        <div class="item" style="height:{{ data_month[month]['intents']*0.5 }}px;margin-top:{{ 200 - data_month[month]['intents']*0.5 }}px">{{data_month[month]['intents']}}</div>
-        {% endfor %}
+        <div class="row">
+            {% for month in data_month %}
+                <div class="item col" style="height:{{ data_month[month]['intents']*0.5 }}px;margin-top:{{ 200 - data_month[month]['intents']*0.5 }}px">{{data_month[month]['intents']}}</div>
+            {% endfor %}
+        </div>
     </div>
 
 </div>
