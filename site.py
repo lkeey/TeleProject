@@ -309,6 +309,39 @@ def show_about(id=0):
         print("data_day", current_data)
         print("yestaerday_data", yesterday_data)
 
+    # Выбираем значки
+    sign_list = list()
+
+    if current_data["messages"] > yesterday_data["messages"]:
+        sign_list.append("img/uparrow_78484.png")
+
+    elif current_data["messages"] < yesterday_data["messages"]:
+        sign_list.append("img/arrowdown_flech_1539.png")
+    
+    else:
+        sign_list.append("img/calculate_equals_icon_194844.png")    
+
+
+    if current_data["users"] > yesterday_data["users"]:
+        sign_list.append("img/uparrow_78484.png")
+
+    elif current_data["users"] < yesterday_data["users"]:
+        sign_list.append("img/arrowdown_flech_1539.png")
+    
+    else:
+        sign_list.append("img/calculate_equals_icon_194844.png")
+
+
+    if current_data["intents"] > yesterday_data["intents"]:
+        sign_list.append("img/uparrow_78484.png")
+
+    elif current_data["intents"] < yesterday_data["intents"]:
+        sign_list.append("img/arrowdown_flech_1539.png")
+    
+    else:
+        sign_list.append("img/calculate_equals_icon_194844.png")
+
+
     with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
         amount_users = 0
         amount_messages = 0
@@ -321,7 +354,7 @@ def show_about(id=0):
             amount_messages += data_months[month]["messages"]
             amount_intents += data_months[month]["intents"]
 
-    return render_template("about.html", id=id, amount_intents=amount_intents, amount_users=amount_users, amount_messages=amount_messages, current_data=current_data, yesterday_data=yesterday_data )
+    return render_template("about.html",sign_list=sign_list, id=id, amount_intents=amount_intents, amount_users=amount_users, amount_messages=amount_messages, current_data=current_data, yesterday_data=yesterday_data )
 
 if __name__ == '__main__':
       app.run(debug=True)
