@@ -6,6 +6,7 @@ from unittest import result
 from deepface import DeepFace
 import qrcode
 import numpy as np 
+from forex_python.converter import CurrencyRates
 
 def test():
     counter = 0
@@ -506,7 +507,7 @@ def amount_data():
         
         json.dump(data, file, sort_keys = True)
 
-amount_data()
+
 
 def data_day():
     with open('Data-Bases/Data-Amount.json', 'r', encoding='utf-8') as file:
@@ -526,6 +527,10 @@ def data_day():
             }
             json.dump(data, file, sort_keys = True)
 
-data_day()
+
 
 print(f'{datetime.now().strftime("%m")}')
+
+
+
+

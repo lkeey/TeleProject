@@ -31,6 +31,7 @@ import qrcode
 import numpy as np 
 import os
 import emoji
+from forex_python.converter import CurrencyRates
 
 # Variables
 open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
@@ -636,16 +637,16 @@ def print_bio(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Warninng in BIO ⚠\nPlease, write /error")
 
     # update.message.reply_text("*** BIO ***")
-    update.message.reply_text(emoji.emojize("Имя: "+str(user_data["first_name"])+" :bust_in_silhouette:", language = 'alias'))
-    update.message.reply_text(emoji.emojize("Фамилия: "+str(user_data["last_name"])+" :credit_card:", language = 'alias'))
-    update.message.reply_text(emoji.emojize("Предпочтительный язык: "+str(user_data["language_code"])+" :tongue:", language = 'alias'))
-    update.message.reply_text(emoji.emojize("ID: "+str(user_data["id"])+" :id:", language = 'alias' ))
-    update.message.reply_text(emoji.emojize("Логин: "+str(user_data["username"])+" :lock:", language = 'alias'  ))
-    update.message.reply_text(emoji.emojize("Пароль: "+str(user_data["password"])+" :key:", language = 'alias'))
-    update.message.reply_text(emoji.emojize("Статус: "+str(user_data["main"])+" :free:", language = 'alias'))
-    update.message.reply_text(emoji.emojize("Пост: "+str(user_data["post"])+" :chart_with_upwards_trend:", language = 'alias'))
-    update.message.reply_text(emoji.emojize("Был зарегистрирован: "+str(user_data["registered"])+" ⓡ", language = 'alias'))
-    update.message.reply_text(emoji.emojize("Roots: "+str(user_data["points"])+" :deciduous_tree:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("*Имя:* "+str(user_data["first_name"])+" :bust_in_silhouette:", language = 'alias'), parse_mode='MarkdownV2' )
+    update.message.reply_text(emoji.emojize("*Фамилия:* "+str(user_data["last_name"])+" :credit_card:", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("*Предпочтительный язык:* "+str(user_data["language_code"])+" :tongue:", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("*ID:* ||"+str(user_data["id"])+"|| :id:", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("Логин: "+str(user_data["username"])+" :lock:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("*Пароль:* ||"+str(user_data["password"])+"|| :key:", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("*Статус:* "+str(user_data["main"])+" :free:", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("*Пост:* "+str(user_data["post"])+" :chart_with_upwards_trend:", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("*Был зарегистрирован:* "+str(user_data["registered"])+" ⓡ", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("*Roots:* "+str(user_data["points"])+" :deciduous_tree:", language = 'alias'), parse_mode='MarkdownV2')
 
     update.message.reply_text(emoji.emojize("Чтобы заработать Intent-ы переходи сюда:(url...) :link:", language = 'alias'))
     
@@ -708,8 +709,8 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
         print("User_time:", user_time+fifteen_minutes)
         print("Now:", now_time)
 
-    update.message.reply_text(emoji.emojize("Online: "+str(counter_online)+" :iphone:", language = 'alias'))
-    update.message.reply_text(emoji.emojize("Admins: "+str(admin_counter)+ "👨‍💻", language = 'alias'))
+    update.message.reply_text(emoji.emojize("*Online:* "+str(counter_online)+" :iphone:", language = 'alias'), parse_mode='MarkdownV2')
+    update.message.reply_text(emoji.emojize("*Admins:* "+str(admin_counter)+ "👨‍💻", language = 'alias'), parse_mode='MarkdownV2')
 
     # Добавить спрятанный текст
     update.message.reply_text(emoji.emojize("Общее количество пользователей, зарегистрированных в Future Forest: "+str(len(users_data))+" :busts_in_silhouette:", language = 'alias'))
@@ -867,7 +868,6 @@ def print_info(update: Update, context: CallbackContext) -> None:
     # What can this bot do?
 
 
-     
     string = '''· Возможность общения с чат-ботом 💬\n
 · Получение погоды в любом городе ⛅\n 
 · Отправка рандомного стикера, а также его сохранение в базу данных 📝\n
@@ -883,7 +883,6 @@ def print_info(update: Update, context: CallbackContext) -> None:
 
     update.message.reply_text("Функции Future Forest: 🌳")
     update.message.reply_text(string)
-
 
 
 
@@ -914,9 +913,9 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("qr", qr_code))    
     dispatcher.add_handler(CommandHandler("error", print_error))    
     dispatcher.add_handler(CommandHandler("info", print_info))    
+   
         
     
-
     dispatcher.add_handler(MessageHandler(Filters.sticker, new_smile))
     dispatcher.add_handler(MessageHandler(Filters.photo, analyze_photo))
 

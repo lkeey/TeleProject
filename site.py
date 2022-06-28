@@ -299,7 +299,14 @@ def show_about(id=0):
             data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
             data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
             data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+       
+        if f'{datetime.now().strftime("%m")+str(int(datetime.now().strftime("%d"))-1)}' not in data_day:
+            data_day[f'{datetime.now().strftime("%m")+str(int(datetime.now().strftime("%d"))-1)}'] = {}
+            data_day[f'{datetime.now().strftime("%m")+str(int(datetime.now().strftime("%d"))-1)}']["intents"] = 0
+            data_day[f'{datetime.now().strftime("%m")+str(int(datetime.now().strftime("%d"))-1)}']["users"] = 0
+            data_day[f'{datetime.now().strftime("%m")+str(int(datetime.now().strftime("%d"))-1)}']["messages"] = 0
 
+        
             with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
                 json.dump(data_day, file, sort_keys = True)
 
