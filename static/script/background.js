@@ -1,11 +1,7 @@
 class GradientAnimation{
     constructor() {
-
         this.cnv = document.querySelector('canvas');
         this.ctx = this.cnv.getContext('2d')
-
-        this.body = document.querySelector('all') 
-        this.body = this.body.getContext("2d")
 
         this.circlesNum = 10;
         this.speed = 0.005;
@@ -16,19 +12,15 @@ class GradientAnimation{
         this.setCanvasSize();
         this.createCircles();
         this.drawAnimation();
-        this.setCanvasSize();
 
         window.onresize = () => {
             this.setCanvasSize();
             this.createCircles();
-        }     
+        }
     }
-    setCanvasSize() {      
-        this.w = this.body.width = innerWidth;
-        this.h = this.body.height = innerHeight;
-
-        console.log("Width", this.w)
-        console.log("Height", this.h)
+    setCanvasSize() {
+        this.w = this.cnv.width = innerWidth;
+        this.h = this.cnv.height = innerHeight;
     }
 
     createCircles() {

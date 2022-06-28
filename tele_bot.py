@@ -913,9 +913,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("qr", qr_code))    
     dispatcher.add_handler(CommandHandler("error", print_error))    
     dispatcher.add_handler(CommandHandler("info", print_info))    
-   
-        
-    
+  
     dispatcher.add_handler(MessageHandler(Filters.sticker, new_smile))
     dispatcher.add_handler(MessageHandler(Filters.photo, analyze_photo))
 
