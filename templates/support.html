@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %} Support Page {% endblock %}
+
+{% block ico %}
+type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename='img/help-file_40451.png') }}"
+{% endblock %}
+
+{% block body %}
+<div class="container instuction">
+    <hr>
+ 
+    <h1><span>Н</span><span>а</span><span>ч</span><span>а</span><span>л</span><span>о</span><span> &nbsp</span><span>р</span><span>а</span><span>б</span><span>о</span><span>т</span><span>ы</span><span> &nbsp</span><span>с</span><span> &nbsp</span><span>F</span><span>u</span><span>t</span><span>u</span><span>r</span><span>e</span><span>  &nbsp</span><span>F</span><span>o</span><span>r</span><span>e</span><span>s</span><span>t</span></h1>
+    <div class="container">
+        <strong>1. Зарегистрируйтесь:</strong>
+        <ul>
+            <br><li><a target="_blank" href="https://t.me/future_forest_twicef_bot" class="link-dark"><b> Перейдите </b>в telegram-bot</a></li>
+            <li>Нажмите на <b>команду</b> <i>/start</i></li>
+            <li>В разделе <b>Menu</b>  выберите команду <i>/bio</i></li>
+            <li> Введите данные на <a href="/logging" class="link-dark" target="_blank">этой</a> странице</li>
+            <li> Поздравляем, Вы теперь во <strong> Future Forest!</strong></li>
+        </ul>
+        <br><strong>2. Создание Roots</strong>
+        <p>Roots помогают Future Forest развиваться</p> 
+        <ul>
+            <li>Чтобы создать собственный root, перейдите на вкладку <i>Create</i></li>
+            <li><strong>Topic</strong> отвечает за тему root</li>
+            <li><strong>Answer</strong> хранит в себе вопрос пользователя</li>
+            <li><strong>Responce</strong> содержит ответ на вопрос, названный в <i>Answer</i></li>
+        </ul>
+        <br><strong>3. Статистические данные</strong>
+        <p>Вы можете следить за стастикой как на сайте, так и в telegram-bot</p>
+        <ul>
+            <li>Статика, отображаемая на сайте, <b>не содержит личных данный пользователей</b> </li>
+            <li> Статистические данные находятся в <b>свободном доступе</b>  для любого пользователя</li>
+            <li>Владельцы и учередители Future Forest <b> не несут ответственности </b>за сохранение безопасности личных данных пользователей (Закон о персональных данных №152-ФЗ)</li>
+        </ul>
+    </div>
+    <button type="button" class="btn btn-light btn-cheking">Click here if this article helped you!</button>
+
+</div>
+<script src="{{ url_for('static', filename='script/pattern.js') }}"></script> 
+
+{% endblock %}

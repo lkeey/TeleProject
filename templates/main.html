@@ -14,7 +14,7 @@ type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename=
     
     <div class="row">
         
-            <div id="graph" class="container top shadow-lg graph vertical col-5">
+            <div id="graph" class="container top shadow-lg graph vertical col-lg-5 col-md-10">
                 <h3 class="text-center">MESSAGES</h3>
                 <div class="row">
                     {% for month in data_month %}
@@ -23,7 +23,7 @@ type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename=
                 </div>
             </div>
 
-            <div id="graph" class="container top shadow-lg graph vertical col-5" style="min-height: fit-content;">
+            <div id="graph" class="container top shadow-lg graph vertical col-lg-5 col-md-10" style="min-height: fit-content;">
                 <h3 class="text-center">USERS</h3>
                 <div class="row">
                     {% for month in data_month %}
@@ -34,7 +34,7 @@ type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename=
         
     </div>
 
-    <div id="graph" class="container top shadow-lg graph vertical col-5" style="min-height: fit-content;">
+    <div id="graph" class="container top shadow-lg graph vertical col-lg-6 col-md-10" style="min-height: fit-content;">
         <h3 class="text-center">INTENTS</h3>
         <div class="row">
             {% for month in data_month %}
@@ -44,6 +44,8 @@ type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename=
     </div>
 
 </div>
+
+
 
 <script src="{{ url_for('static', filename='script/background.js') }}"></script>
 

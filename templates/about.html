@@ -9,7 +9,7 @@ type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename=
 {% block body %}
 
 <div class="row">
-    <div class="col-5 top shadow-lg container">
+    <div class="col-lg-5 col-md-8 top shadow-lg container">
         
         <br><p style="display: inline;"><b class="urgent-day">MESSAGES</b>&nbsp;{{current_data["messages"]}}</p>&nbsp;
         
@@ -23,7 +23,7 @@ type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename=
         <br>
 
     </div>
-    <div class="col-4 top shadow-lg container">
+    <div class="col-lg-4 col-md-8 top shadow-lg container">
         <br><p><b class="urgent-all">Registered Users</b>&nbsp;{{amount_users}}&nbsp;people</p>
         <br><p><b class="urgent-all">Sent Messages</b>&nbsp;{{amount_messages}}&nbsp;messages</p>
         <br><p><b class="urgent-all">Added Intents</b>&nbsp;{{amount_intents}}&nbsp;intents</p>

@@ -1,12 +1,19 @@
-from flask import Flask, render_template, redirect, url_for, request
+from os import urandom
+import ssl
+from flask import Flask, render_template, redirect, url_for, request, session
 import json
+import os 
 from datetime import datetime
+from base64 import b64encode
 
 app = Flask(__name__)
 
 # VARIABLES
 amount_place = 2
 id = 0
+key = ''
+
+app.config['SECRET_KEY'] = os.urandom(32)
 
             # Функции для back-end
 def top(users_data):
@@ -24,7 +31,7 @@ def top(users_data):
     top_place = list()
 
     # количество мест
-    for i in range(amount_place):
+    for i in range(len(users_data)):
         # Наивысшее место
         the_most_place = max(points_list)
         points_list.remove(the_most_place)
@@ -96,9 +103,13 @@ def save_intent(example, responce):
 @app.route("/<int:id>", methods=["GET"])
 @app.route("/", methods=["GET"])
 def main_page(id=0):
+
+    if not session.modified:
+        session["verificat_key"] = b64encode(os.urandom(1)).decode('utf-8')
+        session.modified = True
+
     print("ID", id)
     
-
     with open('Data-Bases/Data-Amount.json', 'r', encoding='utf-8') as file:
         data_amount = json.load(file)["months"]
     
@@ -106,189 +117,222 @@ def main_page(id=0):
         for month in data_amount:
             print(f"{month} - {data_amount[month]['users']} users - {data_amount[month]['messages']} messages - {data_amount[month]['intents']} intents")
 
-    return render_template("main.html",data_month=data_amount, id=id)
+    return render_template("main.html",data_month=data_amount, id=id, verificat_key=session["verificat_key"])
 
 # Logging
-@app.route("/logging", methods=["GET", "POST"])
-def logging_page():
+@app.route("/logging/<key>", methods=["GET", "POST"])
+def logging_page(key=''):
     global top_user
-    if request.method == "POST":
+    print(f"{key} - {session['verificat_key']}")
+    if session["verificat_key"] == key: 
+        if not session.modified:
+            session.modified = True
+        session["verificat_key"] = b64encode(os.urandom(1)).decode('utf-8')
+        print(f"Logging: Incorrect verificate key\nKey is {key} - {session['verificat_key']}")
+    
+        if request.method == "POST":
 
+            # login-пользователя
+            login = request.form["login"]
+            # password-пользователя
+            password = request.form["password"]
+            print("Login",login,"\nPASSWORD",password)
 
-        # id-пользователя
-        id = request.form["id"]
+            try:
+            # открытие словаря со всеми данными пользователей
+                with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
+                    # Весь
+                    data_all_users = json.load(file)
+                    users_data = data_all_users["users"]
 
-        password = request.form["password"]
-        print("ID",id,"\nPASSWORD",password)
+                for id in users_data:
+                    if login == users_data[id]["username"]:
+                        if users_data[id]["password"] == password:
 
-        try:
-        # открытие словаря со всеми данными пользователей
-            with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
-                # Весь
-                data_all_users = json.load(file)
-                users_data = data_all_users["users"]
+                            # data = users_data[id]
 
-            if id in users_data:
-                if users_data[id]["password"] == password:
+                            # Вычисление топа
+                            top_user = top(users_data)
+                            print("ID", id)
 
-                    # data = users_data[id]
+                            return redirect(f'/{id}')    
 
-                    # Вычисление топа
-                    top_user = top(users_data)
-                    print("ID", id)
+                return render_template("logging.html", success=False, verificat_key=session["verificat_key"])
 
-                    return redirect(f'/{id}')    
+            except Exception as _Ex:
+                print("Warning in logging:\n", _Ex)
 
-            return "Password is incorrect"
-
-        except Exception as _Ex:
-            print("Warning in logging:\n", _Ex)
-
-    return render_template("logging.html")
-
+        return render_template("logging.html", success=True, verificat_key=session["verificat_key"])
+    
+    print(f"Logging: Incorrect verificate key\nKey is {key} - {session['verificat_key']}")
+    try:
+        return redirect(f'/{id}') 
+    except:
+        return redirect(f'/{0}')
 
 # Global Page
-@app.route("//create", methods=["GET","POST"])
-@app.route("/<int:id>/create", methods=["GET","POST"])
-def form(id=0):
+@app.route("//create/<key>", methods=["GET","POST"])
+@app.route("/<int:id>/create/<key>", methods=["GET","POST"])
+def form(id=0, key=''):
     print("ID", id)
-    if id == 0:
-        return redirect('/logging') 
-
-    # открытие словаря со вsсеми данными пользователей
-    
-    try:
-        
-        if request.method == "POST":
-            topic = request.form["topic"]
-            example = request.form["example"]
-            responce = request.form["responce"]
-
-            print("TOPIC", topic,"\nEXAMPLE", example,"\nRESPONCE", responce)
+    if session["verificat_key"] == key:
+        if not session.modified:
+            session.modified = True
+        session["verificat_key"] = b64encode(os.urandom(1)).decode('utf-8')
             
-            if topic != '' and example != '' and responce != '':
-                # 
-                try:
-                    # Добавление опыта пользователю
-                    print("Experience")
+        if id == 0:
+            return redirect(f'/logging/{session["verificat_key"]}') 
 
-                    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-                        # Весь
-                        data_all_users = json.load(file)
-                        user_data = data_all_users["users"]
-                    
-                    user_data[str(id)]["points"] += 3
-
-                    with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
-                        data = {
-                                "users": user_data
-                                }
-                        json.dump(data, file, sort_keys = True)
-
-                    print("INTENT")
-                    # Добавление предложенных пользователем intent и responce
-
-                    with open("Data-Bases/Data_Base.json", "r", encoding='utf-8') as file:
-                        data = json.load(file)
-                        data_intents = data["intents"]
-
-                    name_topic = f"{str(id)}_{str(user_data[str(id)]['points'])}"
-
-                    data_intents[name_topic] = {}
-                    data_intents[name_topic]["examples"] = example
-                    data_intents[name_topic]["responses"] = responce
-
-                    print(data_intents[name_topic])
-
-                    with open('Data-Bases/Data_Base.json', 'w', encoding='utf-8') as file:
-                        
-                        data = {
-                                "intents": data_intents
-                                }
-                        json.dump(data, file, sort_keys = True)
-
-
-                    # Добавление интентов за день
-                    
-                    print("Add Intent Count")
-                    with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
-                        data_day = json.load(file)
-                        if f'{datetime.now().strftime("%m%d")}' not in data_day:
-                            data_day[f'{datetime.now().strftime("%m%d")}'] = {}
-                            data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
-                            data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
-                            data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
-
-                        data_day[f'{datetime.now().strftime("%m%d")}']["intents"] += 3
-                           
-                    with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
-                        json.dump(data_day, file, sort_keys = True)
-
-                    # Добавление интента в data-amount
-                    with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
-                        data_day = json.load(file)["months"]
-                        print("Month", datetime.now().strftime("%m"))
-                        print("Data", data_day[f'{datetime.now().strftime("%m")}'])
-                        
-                        data_day[f'{datetime.now().strftime("%m")}']["intents"] += 3
-
-                    with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
-                        data = {"months": data_day}
-                        
-                        json.dump(data, file, sort_keys = True)
-
-                    print("END INTENT")
-
-                except Exception as _Ex:
-                    print("Warning in saving", _Ex)
-                    return render_template("index.html",id=id, )
-
-                return redirect(f'/{id}')  
-
-            return render_template("index.html",id=id, )
+        # открытие словаря со вsсеми данными пользователей
         
-        return render_template("index.html",id=id, )
+        try:
+            
+            if request.method == "POST":
+                topic = request.form["topic"]
+                example = request.form["example"]
+                responce = request.form["responce"]
 
-    except Exception as _Ex:
-        print("Warning in Save Intent", _Ex)
-        return render_template("index.html",id=id, data_user=data)
+                print("TOPIC", topic,"\nEXAMPLE", example,"\nRESPONCE", responce)
+                
+                if topic != '' and example != '' and responce != '':
+                    # 
+                    try:
+                        # Добавление опыта пользователю
+                        print("Experience")
 
-@app.route("//profile", methods=["GET","POST"])
-@app.route("/<int:id>/profile", methods=["GET"])
-def show_profile(id=0):
-    print("ID", id)
-    if id == 0:
-        return redirect('/logging') 
+                        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+                            # Весь
+                            data_all_users = json.load(file)
+                            user_data = data_all_users["users"]
+                        
+                        user_data[str(id)]["points"] += 3
 
-    with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
-        # Весь
-        data_all_users = json.load(file)
-        users_data = data_all_users["users"]
-        data = users_data[str(id)]
+                        with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+                            data = {
+                                    "users": user_data
+                                    }
+                            json.dump(data, file, sort_keys = True)
 
-    with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
-        # Весь
-        data_all_users = json.load(file)
-        users_data = data_all_users["users"]
+                        print("INTENT")
+                        # Добавление предложенных пользователем intent и responce
 
-    top_user = top(users_data)
+                        with open("Data-Bases/Data_Base.json", "r", encoding='utf-8') as file:
+                            data = json.load(file)
+                            data_intents = data["intents"]
 
-    counter = 0
-    place = None
+                        name_topic = f"{str(id)}_{str(user_data[str(id)]['points'])}"
 
-    for user in top_user:
-        counter += 1
-        if user == users_data[str(id)]["username"]:
-            place = counter
+                        data_intents[name_topic] = {}
+                        data_intents[name_topic]["examples"] = example
+                        data_intents[name_topic]["responses"] = responce
 
+                        print(data_intents[name_topic])
+
+                        with open('Data-Bases/Data_Base.json', 'w', encoding='utf-8') as file:
+                            
+                            data = {
+                                    "intents": data_intents
+                                    }
+                            json.dump(data, file, sort_keys = True)
+
+
+                        # Добавление интентов за день
+                        
+                        print("Add Intent Count")
+                        with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
+                            data_day = json.load(file)
+                            if f'{datetime.now().strftime("%m%d")}' not in data_day:
+                                data_day[f'{datetime.now().strftime("%m%d")}'] = {}
+                                data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
+                                data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
+                                data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+
+                            data_day[f'{datetime.now().strftime("%m%d")}']["intents"] += 3
+                            
+                        with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+                            json.dump(data_day, file, sort_keys = True)
+
+                        # Добавление интента в data-amount
+                        with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+                            data_day = json.load(file)["months"]
+                            print("Month", datetime.now().strftime("%m"))
+                            print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+                            
+                            data_day[f'{datetime.now().strftime("%m")}']["intents"] += 3
+
+                        with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
+                            data = {"months": data_day}
+                            
+                            json.dump(data, file, sort_keys = True)
+
+                        print("END INTENT")
+
+                    except Exception as _Ex:
+                        print("Warning in saving", _Ex)
+                        return render_template("index.html",id=id, verificat_key=session["verificat_key"])
+
+                    return redirect(f'/{id}')  
+
+                return render_template("index.html",id=id, verificat_key=session["verificat_key"])
+            
+            return render_template("index.html",id=id, verificat_key=session["verificat_key"])
+
+        except Exception as _Ex:
+            print("Warning in Save Intent", _Ex)
+            return render_template("index.html",id=id, data_user=data,verificat_key=session["verificat_key"])
     
+    print(f"Create: Incorrect verificate key\nKey is{key} - {session['verificat_key']}")
+    
+    return redirect(f'/{id}') 
 
-    return render_template("profile.html",id=id, data_user=data, top_user=top_user, place_num=place)
+@app.route("//profile/<key>", methods=["GET","POST"])
+@app.route("/<int:id>/profile/<key>", methods=["GET"])
+def show_profile(id=0, key=''):
+    print("ID", id)
+    
+    if session["verificat_key"] == key:
+        if not session.modified:
+            session.modified = True
+        session["verificat_key"] = b64encode(os.urandom(1)).decode('utf-8')
+      
 
+        if id == 0:
+            return redirect(f'/logging/{session["verificat_key"]}') 
+
+        with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
+            # Весь
+            data_all_users = json.load(file)
+            users_data = data_all_users["users"]
+            data = users_data[str(id)]
+
+        with open("Data-Bases/Data-users.json", "r", encoding='utf-8') as file:
+            # Весь
+            data_all_users = json.load(file)
+            users_data = data_all_users["users"]
+
+        top_user = top(users_data)
+
+        counter = 0
+
+        for user in top_user:
+            counter += 1
+            if user == users_data[str(id)]["username"]:
+                break
+
+
+        return render_template("profile.html",id=id, data_user=data, top_user=top_user[:amount_place], place_num=counter, verificat_key=session["verificat_key"])
+
+    print(f"Profile: Incorrect verificate key\nKey is{key} - {session['verificat_key']}")
+
+    return redirect(f'/{id}') 
 
 @app.route("//about", methods=["GET","POST"])
 @app.route("/<int:id>/about", methods=["GET"])
 def show_about(id=0):
+    if not session.modified:
+        session.modified = True
+    session["verificat_key"] = b64encode(os.urandom(1)).decode('utf-8')
+
     with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
         # Весь
         data_day = json.load(file)
@@ -361,7 +405,17 @@ def show_about(id=0):
             amount_messages += data_months[month]["messages"]
             amount_intents += data_months[month]["intents"]
 
-    return render_template("about.html",sign_list=sign_list, id=id, amount_intents=amount_intents, amount_users=amount_users, amount_messages=amount_messages, current_data=current_data, yesterday_data=yesterday_data )
+    return render_template("about.html",sign_list=sign_list, id=id, amount_intents=amount_intents, amount_users=amount_users, amount_messages=amount_messages, current_data=current_data, yesterday_data=yesterday_data, verificat_key=session["verificat_key"] )
+
+@app.route("//support", methods=["GET","POST"])
+@app.route("/<int:id>/support", methods=["GET"])
+def show_support(id=0):
+    if not session.modified:
+        session.modified = True
+    session["verificat_key"] = b64encode(os.urandom(1)).decode('utf-8')
+
+    return render_template("support.html", id=id, verificat_key=session["verificat_key"])
+
 
 if __name__ == '__main__':
       app.run(debug=True)

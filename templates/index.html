@@ -15,8 +15,8 @@ type="image/png" sizes="120x120" rel="icon" href="{{ url_for('static', filename=
         <hr>
 
         <div class="row">
-            <form method="post">
-                <div class="form intent-form container col-7">
+            <form method="post" action="/{{id}}/create/{{verificat_key}}">
+                <div class="form intent-form container col-md-10 col-lg-7">
                     <input id="topic" class="form-control" name="topic" type="text" placeholder="Topic"/><br>
                     <input id="answer" class="form-control" name="example" type="text" placeholder="Answer"/><br>
                     <input id="responce" class="form-control" name="responce" type="text" placeholder="Responce"><br>

@@ -3,6 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Log In</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+
 	<link rel="stylesheet" type="text/css" href="{{ url_for( 'static', filename='style/style_logging.css')}}">	
 	<link type="image/png" sizes="120x120" rel="icon" href="static/img/3643767-key-keys-main-password-privilege_113429.png">
 	<style>
@@ -15,27 +17,38 @@
 	 
 </head>
 <body>
-	<div class="title">
-		<h1>Future Forest</h1>
-	</div>
-	<form method="post" method="post">
-		<div class="form">
-			<h1>Entrance</h1>
-
-			<div class="input-form">
-				<input type="text" name="id" placeholder="ID">
+	<div class="container">
+		<div class="title row">
+			<div class="container">
+				<a href="/{{ id }}" class="link-dark"><h1 style="text-shadow: 0px 4px 3px rgba(0,0,0,0.4), 0px 8px 13px rgba(0,0,0,0.1),0px 18px 23px rgba(0,0,0,0.1);
+					">Future Forest</h1></a>
 			</div>
-
-			<div class="input-form">
-				<input type="password" name="password" placeholder="Password">
-			</div>
-
-			<div class="input-form">
-				<input type="submit" value="Log In">
-			</div>
-
 		</div>
-	</form>
-	
+		<form method="post" action="/logging/{{verificat_key}}">
+			<div class="row">
+				
+					<div class="form container col-md-10 col-lg-8">
+					{% if success == False %}
+						<h1 style="color:red;">Password Is Incorrect</h1>
+					{% endif %}
+					<h1>Entrance</h1>
+
+					
+					<div class="input-form">
+						<input type="text" name="login" placeholder="Login">
+					</div>
+
+					<div class="input-form">
+						<input type="password" name="password" placeholder="Password">
+					</div>
+
+					<div class="input-form">
+						<input type="submit" value="Log In">
+					</div>
+					
+				</div>
+			</div>
+		</form>
+	</div>
 </body>
 </html>
