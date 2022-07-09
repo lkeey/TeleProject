@@ -2,11 +2,14 @@ import json
 from datetime import datetime, timedelta
 from requests import request
 import telebot
-from unittest import result
 from deepface import DeepFace
 import qrcode
 import numpy as np 
 from forex_python.converter import CurrencyRates
+from icrawler.builtin import GoogleImageCrawler
+import os
+import shutil
+from translate import Translator
 
 def test():
     counter = 0
@@ -528,9 +531,33 @@ def data_day():
             json.dump(data, file, sort_keys = True)
 
 
+def GoogleImgDownload():
+    id = 5
+    filters = dict(
+        type='photo'
+    )
 
-print(f'{datetime.now().strftime("%m")}')
+    crawler = GoogleImageCrawler(storage={'root_dir': f'./img_by_{id}'})
+    crawler.crawl(keyword='spongebob', max_num=5, filters=filters)
+    
+    for filename in os.listdir(f'./img_by_{id}'):
+
+        with open(os.path.join(f'./img_by_{id}', filename), 'rb') as f:
+            print("FILE", f)
+
+    path = os.path.join(os.path.abspath(os.path.dirname(__file__)), f'./img_by_{id}')
+    shutil.rmtree(path)
+
+def CutWikiPage():
+    string = "<WikipediaPage 'Moscow'>"
+
+    print(string[16:(len(string)-2)])
 
 
+def translate(text):
+ 
+    translator = Translator(from_lang="ru", to_lang="en")
+    text = translator.translate(text)
+    print(text)
 
 

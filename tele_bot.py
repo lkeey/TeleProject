@@ -8,7 +8,10 @@
 # Работа с текстом (озвучка)
 # Работа с голосовыми сообщениями
 # Админ и обычный 
+
+# Модуль
 import wiki_search
+
 from random import *
 from time import *
 from datetime import datetime, timedelta
@@ -32,6 +35,9 @@ import numpy as np
 import os
 import emoji
 from forex_python.converter import CurrencyRates
+from icrawler.builtin import GoogleImageCrawler
+import shutil
+from translate import Translator
 
 # Variables
 open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
@@ -466,7 +472,11 @@ def echo(update: Update, context: CallbackContext) -> None:
     elif get_sentence and not get_url and not get_weather and not get_qr:
         add_message(1)
 
-        sentence = update.message.text
+        # перевод на English
+        translator = Translator(from_lang="ru", to_lang="en")
+        sentence = translator.translate(update.message.text)
+        
+        print('Result on EN:', sentence)
  
         update.message.reply_text("Выполняю поиск по Wikipedia 🔎\nПожалуйста, подождите...") 
  
@@ -498,26 +508,49 @@ def echo(update: Update, context: CallbackContext) -> None:
         update.message.reply_text(request) 
         try:
             # выбор файла
-            if len(wikipedia.page(request).images) >= 0:
-                for i in range(len(wikipedia.page(request).images)):
-                    url = wikipedia.page(request).images[i]
+            # if len(wikipedia.page(request).images) >= 0:
+            #     for i in range(len(wikipedia.page(request).images)):
+            #         url = wikipedia.page(request).images[i]
                     
-                    if "png" in url:
-                        filename = f"wiki{id}.png"
-                        wget.download(url, filename)
+            #         if "png" in url:
+            #             filename = f"wiki{id}.png"
+            #             wget.download(url, filename)
 
-                        with open(filename, "rb") as file_send:
-                            update.message.reply_photo(file_send)
+            #             with open(filename, "rb") as file_send:
+            #                 update.message.reply_photo(file_send)
 
-                        os.remove(filename)
-                        print(url)
-                        break
+            #             os.remove(filename)
+            #             print(url)
+            #             break
 
             # url = f"https://api.telegram.org/bot<{tlgrm_tocken}>/sendPhoto"
             # files = {'photo': open("templates/global_page/img/1st_pict.jpg", 'rb')}
             # data = {'chat_id' : "1010205515"}
             # r= requests.post(url, files=files, data=data)
             # print(r.json())
+
+            # НАходим файлы через ГУГЛ
+            filters = dict(
+                type='photo'
+            )
+
+            # Записываем в папку
+            crawler = GoogleImageCrawler(storage={'root_dir': f'./img_by_{id}'})
+            
+            # из запроса page вырезаем "wikipedia"
+            print("REQUEST IS", str(page)[16:(len((str(page)))-2)])
+            crawler.crawl(keyword=str(page)[16:(len((str(page)))-2)], max_num=5, filters=filters)
+            
+            # Отправляем кадый файл папки
+            for filename in os.listdir(f'./img_by_{id}'):
+
+                with open(os.path.join(f'./img_by_{id}', filename), 'rb') as file_send:
+                    update.message.reply_photo(file_send)
+
+            # Удаляем папку вместе со всеми ее файлами
+            path = os.path.join(os.path.abspath(os.path.dirname(__file__)), f'./img_by_{id}')
+            shutil.rmtree(path)
+
 
         except Exception as _Ex:
             update.message.reply_text("Warning in Wiki ⚠\nPlease, write /error") 
