@@ -10,6 +10,7 @@ from icrawler.builtin import GoogleImageCrawler
 import os
 import shutil
 from translate import Translator
+import requests
 
 def test():
     counter = 0
@@ -559,5 +560,23 @@ def translate(text):
     translator = Translator(from_lang="ru", to_lang="en")
     text = translator.translate(text)
     print(text)
+
+
+def test_send_post_request():
+    secret_key = '=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD, =EF=BF=BD=EF=BF=BD =EF=BF==BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF==BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =EF=BF=BD=EF==BF=BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF==BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD'
+
+    url = f'http://127.0.0.1:5000/get/Data_Users/{secret_key}/'
+
+    # requests.post(url, {"Name": "Sasha"})
+
+    # print("OK")
+
+
+    data = {
+        "json": "Aleksey",
+    }
+
+    r = requests.post(url, data=data)
+    print(r.text)
 
 

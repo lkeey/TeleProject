@@ -9,6 +9,9 @@
 # Работа с голосовыми сообщениями
 # Админ и обычный 
 
+# Разделить базы данных на типы: будут хранится у сайта, 
+#                           будут хранится у бота
+
 # Модуль
 import wiki_search
 
@@ -43,13 +46,37 @@ from translate import Translator
 open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
 tlgrm_tocken = "5366540233:AAEH04SZyyGE4uD7WvTHiRTXKxCvnQ-uqAM"
 google_search = "AIzaSyBzdzDll3gyr7867TsfI2FbIcuEzl_8crA"
+secret_key = '=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD, =EF=BF=BD=EF=BF=BD =EF=BF==BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF==BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =EF=BF=BD=EF==BF=BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF==BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD'
 
-# открытие словаря
-try:
-    with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
-        BOT_CONFIG = json.load(file)
-except:
-    print("WARNING ⚠")
+def request_to_server(name_data):
+    url = f'http://127.0.0.1:5000/get/{name_data}/{secret_key}/'
+    
+    response = requests.get(url).json()
+
+    print("RESPONSE",response)
+
+    return response
+
+def post_to_server(name_data, data_base):
+    try:
+        print("DATA", data_base)
+
+        data = {
+            "json": data_base,
+        }
+
+        headers = {'Content-type': 'application/json',
+                    'Accept': 'text/plain'
+        }
+        
+        url = f'http://127.0.0.1:5000/get/{name_data}/{secret_key}/'
+
+        response = requests.post(url, json=data)
+
+        # print("STATUS", response.text())
+
+    except Exception as _ex:
+        print("Don't open",_ex)
 
 print("Successfully")
 
@@ -57,12 +84,13 @@ def saving_data_of_user(user, data):
 
     # Открытие словаря
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
             # Весь
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            # Пользователя
-            user_data = user_data[str(user["id"])]
+        data_all_users = request_to_server("Data_Users")
+            # user_data = data_all_users["users"]
+        user_data = data_all_users["users"]
+        # Пользователя
+        user_data = user_data[str(user["id"])]
 
     except:
         print("НЕВОЗМОЖНО ОТКРЫТЬ!")
@@ -95,55 +123,74 @@ def saving_data_of_user(user, data):
     data_all_users["users"][str(user["id"])]["city"] = data["city"]
 
     try:
-        with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
-            data = {
-                    "users": data_all_users["users"]
-                    }
-            json.dump(data, file, sort_keys = True)
-    except:
-        print("НЕ ОТКРЫВАЕТСЯ")
+        # with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+        
+        data = {
+                "users": data_all_users["users"]
+                }
+
+        print("ALL OKEY")
+
+        #     json.dump(data, file, sort_keys = True)
+        post_to_server("Data_Users", data)
+
+        print("ALL OKEY 2")
+
+    except Exception as _EX:
+        print("НЕ ОТКРЫВАЕТСЯ HERE\n"+str(_EX))
 
 def add_message(amount):
     # В словарь DAY
     try:
-        with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
-            data_day = json.load(file)
-            if f'{datetime.now().strftime("%m%d")}' not in data_day:
-                data_day[f'{datetime.now().strftime("%m%d")}'] = {}
-                data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
-                data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
-                data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+        # with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
+            # data_day = json.load(file)
 
-            data_day[f'{datetime.now().strftime("%m%d")}']["messages"] += amount
-                
-        with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
-            json.dump(data_day, file, sort_keys = True)
+        data_day = request_to_server("Data_Day")
+
+        if f'{datetime.now().strftime("%m%d")}' not in data_day:
+            data_day[f'{datetime.now().strftime("%m%d")}'] = {}
+            data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
+            data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
+            data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+
+        data_day[f'{datetime.now().strftime("%m%d")}']["messages"] += amount
+            
+        # with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+        #     json.dump(data_day, file, sort_keys = True)
+
+        post_to_server("Data_Day", data_day)
 
         # В словарь AMOUNT
-        with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
-            data_day = json.load(file)["months"]
-            print("Month", datetime.now().strftime("%m"))
-            print("Data", data_day[f'{datetime.now().strftime("%m")}'])
-            
-            data_day[f'{datetime.now().strftime("%m")}']["messages"] += 3
+        # with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+            # data_day = json.load(file)["months"]
 
-        with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
-            data = {"months": data_day}
+        request_to_server("Data_Amount")["months"]
+        print("Month", datetime.now().strftime("%m"))
+        print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+        
+        data_day[f'{datetime.now().strftime("%m")}']["messages"] += 3
+
+        # with open("Data-Bases/Data_Amount.json", "w", encoding='utf-8') as file:
+        data = {"months": data_day}
             
-            json.dump(data, file, sort_keys = True)
+            # json.dump(data, file, sort_keys = True)
+
+        post_to_server("Data_Amount", data)
     except Exception as _Ex:
         print("Warning in Add_Message\n", _Ex)
 
 def add_online(user):
     # Открытие словаря
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+            # data_all_users = json.load(file)
 
-    except:
-        print("НЕ ОТКРЫВАЕТСЯ")
+        data_all_users = request_to_server("Data_Users")
+        user_data = data_all_users["users"]
+        user_data = user_data[str(user["id"])]
+
+    except Exception as _EX:
+        print("НЕ ОТКРЫВАЕТСЯ "+str(_EX))
 
     user_data["main"] = "online"
 
@@ -153,9 +200,10 @@ def get_password():
     # 8 символов
     all_passwords = list()
     
-    with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-        data_all_users = json.load(file)
-        data_all_users = data_all_users["users"]
+    # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        # data_all_users = json.load(file)
+    data_all_users = request_to_server("Data_Users")    
+    data_all_users = data_all_users["users"]
         
     for user in data_all_users:
         print(data_all_users[user]['password'])
@@ -222,9 +270,10 @@ def start(update: Update, context: CallbackContext) -> None:
         }
 
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            data_all_users = data_all_users["users"]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+        data_all_users = data_all_users["users"]
     except:
         update.message.reply_text(emoji.emojize("Warning in open BASE-DATA :warning:\nPlease, write /error", language = 'alias' ))
 
@@ -232,39 +281,47 @@ def start(update: Update, context: CallbackContext) -> None:
     if not (data_user["id"] in data_all_users):
         data_all_users[data_user["id"]] = data_user
         try:
-            with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
-                data = {
-                        "users": data_all_users
-                        }
-                json.dump(data, file, sort_keys = True)
-
+            # with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+            data = {
+                    "users": data_all_users
+                    }
+                # json.dump(data, file, sort_keys = True)
+            post_to_server("Data_Users", data)
             # Добавление в словарь DAY
 
-            with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
-                data_day = json.load(file)
-                if f'{datetime.now().strftime("%m%d")}' not in data_day:
-                    data_day[f'{datetime.now().strftime("%m%d")}'] = {}
-                    data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
-                    data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
-                    data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+            # with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
+            #     data_day = json.load(file)
 
-                data_day[f'{datetime.now().strftime("%m%d")}']["users"] += 1
-                           
-            with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
-                json.dump(data_day, file, sort_keys = True)
+            data_day = request_to_server("Data-day")
+
+            if f'{datetime.now().strftime("%m%d")}' not in data_day:
+                data_day[f'{datetime.now().strftime("%m%d")}'] = {}
+                data_day[f'{datetime.now().strftime("%m%d")}']["intents"] = 0
+                data_day[f'{datetime.now().strftime("%m%d")}']["users"] = 0
+                data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
+
+            data_day[f'{datetime.now().strftime("%m%d")}']["users"] += 1
+                        
+            # with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
+            #     json.dump(data_day, file, sort_keys = True)
+            
+            post_to_server("Data_Day", data_day) 
 
             # В словарь AMOUNT
-            with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
-                data_day = json.load(file)["months"]
-                print("Month", datetime.now().strftime("%m"))
-                print("Data", data_day[f'{datetime.now().strftime("%m")}'])
-                
-                data_day[f'{datetime.now().strftime("%m")}']["users"] += 1
+            # with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+            #     data_day = json.load(file)["months"]
+            request_to_server("Data_Amount")["months"]
+            print("Month", datetime.now().strftime("%m"))
+            print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+            
+            data_day[f'{datetime.now().strftime("%m")}']["users"] += 1
 
-            with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
-                data = {"months": data_day}
+            # with open("Data-Bases/Data_Amount.json", "w", encoding='utf-8') as file:
+            data = {"months": data_day}
                 
-                json.dump(data, file, sort_keys = True)
+                # json.dump(data, file, sort_keys = True)
+            
+            post_to_server("Data_Amount", data)
 
         except Exception as _Ex:
             update.message.reply_text(emoji.emojize("Warning in open data-user :warning:\nPlease, write /error", language = 'alias' ))
@@ -276,47 +333,72 @@ def start(update: Update, context: CallbackContext) -> None:
         update.message.reply_text(emoji.emojize("С возвращением)\nВижу:eyes:, вы уже были здесь зарегистрированы!", language = 'alias'))
     # update.message.reply_text(str(len(data_all_users)))
         # Остальные сообщения
-corpus = []
-y = []
-for intent in BOT_CONFIG['intents'].keys():
-    for example in BOT_CONFIG['intents'][intent]['examples']:
-        corpus.append(example)
-        y.append(intent)
+    
+    
 
-corpus_train, corpus_test, y_train, y_test = sklearn.model_selection.train_test_split(corpus, y, test_size=0.2)
-# векторайзер
-# vectorizer = sklearn.feature_extraction.text.CountVectorizer(ngram_range=(2,4), analyzer='char_wb')
-vectorizer = sklearn.feature_extraction.text.TfidfVectorizer(ngram_range=(2, 4), analyzer='char_wb', use_idf=True)
-X_train = vectorizer.fit_transform(corpus_train)
-X_test = vectorizer.transform(corpus_test)
-clf = sklearn.linear_model.RidgeClassifier(copy_X=True, max_iter=200)
-# clf = sklearn.ensemble.RandomForestClassifier()
-clf.fit(X_train, y_train)
-clf.score(X_test, y_test)
 
     # подписка к векторайзеру
-def get_intent_by_model(text):
+def get_intent_by_model(text, BOT_CONFIG):
+
+    
+
+    corpus = []
+    y = []
+    for intent in BOT_CONFIG['intents'].keys():
+        for example in BOT_CONFIG['intents'][intent]['examples']:
+            corpus.append(example)
+            y.append(intent)
+
+    corpus_train, corpus_test, y_train, y_test = sklearn.model_selection.train_test_split(corpus, y, test_size=0.2)
+    # векторайзер
+    # vectorizer = sklearn.feature_extraction.text.CountVectorizer(ngram_range=(2,4), analyzer='char_wb')
+    vectorizer = sklearn.feature_extraction.text.TfidfVectorizer(ngram_range=(2, 4), analyzer='char_wb', use_idf=True)
+    X_train = vectorizer.fit_transform(corpus_train)
+    X_test = vectorizer.transform(corpus_test)
+    clf = sklearn.linear_model.RidgeClassifier(copy_X=True, max_iter=200)
+    # clf = sklearn.ensemble.RandomForestClassifier()
+    clf.fit(X_train, y_train)
+    clf.score(X_test, y_test)
+
     return clf.predict(vectorizer.transform([text]))[0]
 
 def bot(text):
-    intent = get_intent_by_model(text)
-    if intent != 'intent not found:(':
-        return choice(BOT_CONFIG['intents'][intent]['responses'])
-    else:
-        return 'Некорректная форма вопроса!'
+    # открытие словаря
+    try:
+        # with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file: 
+        
+        BOT_CONFIG = request_to_server("Data_Base")
+        print(BOT_CONFIG)
+
+    except:
+        print("WARNING ⚠")
+
+    intent = get_intent_by_model(text, BOT_CONFIG)
+        
+    return BOT_CONFIG['intents'][intent]['responses']
+    
 
 def echo(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
 
     # Открытие словаря
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+
+        print("1 step")
+
+        user_data = data_all_users["users"]
+
+        print("2 step")
+
+        user_data = user_data[str(user["id"])]
+
+        print("I've data")
 
     except:
-        update.message.reply_text(emoji.emojize("Warninng in GET-DATA :warning:\nPlease, write /error", language = 'alias' ))
+        update.message.reply_text(emoji.emojize("Warninng in GET-DATA 1 :warning:\nPlease, write /error", language = 'alias' ))
 
     lang = user_data["language_code"] 
     print("LANG:", lang)
@@ -601,13 +683,17 @@ def weather(update: Update, context: CallbackContext) -> None:
 
     # Открытие словаря
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+        user_data = data_all_users["users"]
+        user_data = user_data[str(user["id"])]
 
-    except:
-        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
+        print("I've data")
+
+    except Exception as _Ex:
+        update.message.reply_text("Warninng in GET-DATA 2 ⚠\nPlease, write /error")
+        print(_Ex)
 
     user_data["rate_weather"] = 1
     user_data["get_weather"] = True
@@ -661,10 +747,11 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     add_online(user)
     
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+        user_data = data_all_users["users"]
+        user_data = user_data[str(user["id"])]
 
     except:
         update.message.reply_text("Warninng in BIO ⚠\nPlease, write /error")
@@ -690,10 +777,11 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
     add_online(user)
     
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            users_data = data_all_users["users"]
-            user_data = users_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+        users_data = data_all_users["users"]
+        user_data = users_data[str(user["id"])]
 
     except Exception as ex:
         update.message.reply_text(str(ex)) 
@@ -827,13 +915,14 @@ def cute_url(update: Update, context: CallbackContext) -> None:
 
     # Открытие словаря
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+        user_data = data_all_users["users"]
+        user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
+        update.message.reply_text("Warninng in GET-DATA 3 ⚠\nPlease, write /error")
 
     user_data["get_url"] = True
     user_data["main"] = "online"
@@ -849,13 +938,14 @@ def search_wiki(update: Update, context: CallbackContext) -> None:
 
     # Открытие словаря
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+        user_data = data_all_users["users"]
+        user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
+        update.message.reply_text("Warninng in GET-DATA 4 ⚠\nPlease, write /error")
 
     user_data["get_sentence"] = True
     user_data["main"] = "online"
@@ -870,13 +960,14 @@ def qr_code(update: Update, context: CallbackContext) -> None:
 
     # Открытие словаря
     try:
-        with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
-            data_all_users = json.load(file)
-            user_data = data_all_users["users"]
-            user_data = user_data[str(user["id"])]
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_all_users = request_to_server("Data_Users")
+        user_data = data_all_users["users"]
+        user_data = user_data[str(user["id"])]
 
     except:
-        update.message.reply_text("Warninng in GET-DATA ⚠\nPlease, write /error")
+        update.message.reply_text("Warninng in GET-DATA 5 ⚠\nPlease, write /error")
 
     user_data["get_qr"] = True
     user_data["main"] = "online"

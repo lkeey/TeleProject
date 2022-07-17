@@ -1,10 +1,11 @@
 from os import urandom
-import ssl
 from flask import Flask, render_template, redirect, url_for, request, session
 import json
 import os 
 from datetime import datetime
 from base64 import b64encode
+
+import simplejson as json
 
 app = Flask(__name__)
 
@@ -12,6 +13,8 @@ app = Flask(__name__)
 amount_place = 2
 id = 0
 key = ''
+secret_key = '=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD, =EF=BF=BD=EF=BF=BD =EF=BF==BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF==BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =EF=BF=BD=EF==BF=BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF==BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD'
+
 
 app.config['SECRET_KEY'] = os.urandom(32)
 
@@ -415,6 +418,129 @@ def show_support(id=0):
     session["verificat_key"] = b64encode(os.urandom(1)).decode('utf-8')
 
     return render_template("support.html", id=id, verificat_key=session["verificat_key"])
+
+    # Возвращают словари 
+
+# Словарь ИНТЕНТОВ
+@app.route("/get/Data_Base/<string:key>/", methods=["GET"])
+def Get_Data_Base(key):
+    print("KEY", key)
+    if key == secret_key:
+    
+        if request.method == "GET":
+
+            try:
+                with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file:
+                    BOT_CONFIG = json.load(file)
+
+                    return BOT_CONFIG
+
+            except Exception as _EX:
+                return("WARNING ⚠\n"+str(_EX) )
+
+
+
+# Словарь Данных Пользователей
+@app.route("/get/Data_Users/<string:key>/", methods=["GET", "POST"])
+def Get_Data_Users(key):
+    print("KEY", key)
+    if key == secret_key:
+        if request.method == "POST":
+            try:
+
+                json_file = request.form['json']
+
+                print("REQUEST", json_file)
+
+                with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
+
+                    json.dump(json_file, file, sort_keys = True)
+
+                return render_template("json_get.html",data=data_all_users,)
+                
+            except Exception as _EX: 
+                return "FAIL \n" + str(_EX)
+
+        elif request.method == "GET":
+
+            try:
+                with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+                    # Весь
+                    data_all_users = json.load(file)
+
+                    return data_all_users
+
+            except Exception as _EX:
+                return("WARNING ⚠\n"+str(_EX) )
+
+# Словарь Данных за День
+@app.route("/get/Data_Day/<string:key>/", methods=["GET", "POST"])
+def Get_Data_Day(key):
+    print("KEY", key)
+    if key == secret_key:
+        if request.method == "POST":
+            try:
+                
+                json_file = json.loads(request.form['json'])
+
+                print("REQUEST", json_file)
+
+                with open("Data-Bases/Data_Amount.json", "w", encoding='utf-8') as file:
+                    json.dump(json_file, file, sort_keys = True)
+
+                return render_template("json_get.html",data=data_day,)
+                
+            except Exception as _EX: 
+                return "FAIL \n" + str(_EX)
+
+        elif request.method == "GET":
+
+            try:
+                with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
+                    data_day = json.load(file)
+
+                    return data_day
+
+            except Exception as _EX:
+                return("WARNING ⚠\n"+str(_EX) )
+
+
+
+
+# Словарь Данных за Весь период
+@app.route("/get/Data_Amount/<string:key>/", methods=["GET", "POST"])
+def Get_Data_Amount(key):
+    print("KEY", key)
+    if key == secret_key:
+        if request.method == "POST":
+            try:
+                # получаем json-file
+                print("1st", type(request.form['json']))
+                print("2nd", type(json.loads(request.form['json'])))
+
+                json_file = json.loads(request.form['json'])
+
+                print("REQUEST", json_file)
+
+                with open("Data-Bases/Data-Amount.json", "w", encoding='utf-8') as file:
+
+                    json.dump(json_file, file, sort_keys = True)
+
+                return render_template("json_get.html",data=data_amount,)
+                
+            except Exception as _EX: 
+                return "FAIL \n" + str(_EX)
+
+        elif request.method == "GET":
+
+            try:
+                with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+                    data_amount = json.load(file)["months"]
+                    
+                    return data_amount
+
+            except Exception as _EX:
+                return("WARNING ⚠\n"+str(_EX) )
 
 
 if __name__ == '__main__':
