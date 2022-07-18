@@ -438,31 +438,35 @@ def Get_Data_Base(key):
             except Exception as _EX:
                 return("WARNING ⚠\n"+str(_EX) )
 
-
-
 # Словарь Данных Пользователей
 @app.route("/get/Data_Users/<string:key>/", methods=["GET", "POST"])
 def Get_Data_Users(key):
+    global data_all_users
+
     print("KEY", key)
     if key == secret_key:
         if request.method == "POST":
             try:
 
-                json_file = request.form['json']
+                json_file = json.loads(request.get_json())['json']
+
+                print("Success get json")
 
                 print("REQUEST", json_file)
 
                 with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
 
                     json.dump(json_file, file, sort_keys = True)
+                    
+                print("Success save json")
 
-                return render_template("json_get.html",data=data_all_users,)
+                return render_template("json_get.html", data=data_all_users,)
                 
             except Exception as _EX: 
                 return "FAIL \n" + str(_EX)
 
         elif request.method == "GET":
-
+            
             try:
                 with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
                     # Весь
@@ -476,16 +480,18 @@ def Get_Data_Users(key):
 # Словарь Данных за День
 @app.route("/get/Data_Day/<string:key>/", methods=["GET", "POST"])
 def Get_Data_Day(key):
+    global data_day
+
     print("KEY", key)
     if key == secret_key:
         if request.method == "POST":
             try:
                 
-                json_file = json.loads(request.form['json'])
+                json_file = json.loads(request.get_json())['json']
 
                 print("REQUEST", json_file)
 
-                with open("Data-Bases/Data_Amount.json", "w", encoding='utf-8') as file:
+                with open("Data-Bases/Data-day.json", "w", encoding='utf-8') as file:
                     json.dump(json_file, file, sort_keys = True)
 
                 return render_template("json_get.html",data=data_day,)
@@ -505,20 +511,20 @@ def Get_Data_Day(key):
                 return("WARNING ⚠\n"+str(_EX) )
 
 
-
-
 # Словарь Данных за Весь период
 @app.route("/get/Data_Amount/<string:key>/", methods=["GET", "POST"])
 def Get_Data_Amount(key):
+    global data_amount
+
     print("KEY", key)
     if key == secret_key:
         if request.method == "POST":
             try:
                 # получаем json-file
-                print("1st", type(request.form['json']))
-                print("2nd", type(json.loads(request.form['json'])))
+                # print("1st", type(request.form['json']))
+                # print("2nd", type(json.loads(request.form['json'])))
 
-                json_file = json.loads(request.form['json'])
+                json_file = json.loads(request.get_json())['json']
 
                 print("REQUEST", json_file)
 

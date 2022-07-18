@@ -561,9 +561,27 @@ def translate(text):
     text = translator.translate(text)
     print(text)
 
+def request_to_server(name_data):
+    secret_key = '=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD, =EF=BF=BD=EF=BF=BD =EF=BF==BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF==BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =EF=BF=BD=EF==BF=BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF==BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD'
+
+    url = f'http://127.0.0.1:5000/get/{name_data}/{secret_key}/'
+    
+    response = requests.get(url).json()
+
+    print("RESPONSE",response)
+
+    return response
 
 def test_send_post_request():
     secret_key = '=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD, =EF=BF=BD=EF=BF=BD =EF=BF==BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF==BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =EF=BF=BD=EF==BF=BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF==BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD'
+
+    data_all_users = request_to_server("Data_Users")
+    user_data = data_all_users["users"]
+    user_data = user_data[str(user["id"])]
+
+    data_all_users["users"]["1010205515"]["city"] = "Moscow"
+
+    print("user_data", user_data)
 
     url = f'http://127.0.0.1:5000/get/Data_Users/{secret_key}/'
 
@@ -571,12 +589,14 @@ def test_send_post_request():
 
     # print("OK")
 
-
     data = {
-        "json": "Aleksey",
+        "json": data_all_users,
     }
 
-    r = requests.post(url, data=data)
-    print(r.text)
+    r = requests.post(url, json=json.dumps(data))
+
+    print("JSON", (json.dumps(data)))
+
+    print(r.status_code)
 
 

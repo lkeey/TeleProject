@@ -65,20 +65,21 @@ def post_to_server(name_data, data_base):
             "json": data_base,
         }
 
-        headers = {'Content-type': 'application/json',
-                    'Accept': 'text/plain'
-        }
+        # headers = {'Content-type': 'application/json',
+        #             'Accept': 'text/plain'
+        # }
         
         url = f'http://127.0.0.1:5000/get/{name_data}/{secret_key}/'
 
-        response = requests.post(url, json=data)
+        response = requests.post(url, json=json.dumps(data))
 
-        # print("STATUS", response.text())
+        print("JSON", (json.dumps(data)))
+
+        print("STATUS", response.status_code)
 
     except Exception as _ex:
         print("Don't open",_ex)
 
-print("Successfully")
 
 def saving_data_of_user(user, data):
 
@@ -140,6 +141,8 @@ def saving_data_of_user(user, data):
         print("НЕ ОТКРЫВАЕТСЯ HERE\n"+str(_EX))
 
 def add_message(amount):
+    print("ADD MESSAGE")
+
     # В словарь DAY
     try:
         # with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
@@ -176,6 +179,10 @@ def add_message(amount):
             # json.dump(data, file, sort_keys = True)
 
         post_to_server("Data_Amount", data)
+
+        print("MESSAGE WAS ADDED")
+
+
     except Exception as _Ex:
         print("Warning in Add_Message\n", _Ex)
 
@@ -223,6 +230,9 @@ def get_password():
 
         # Приветствие ( /start )
 def start(update: Update, context: CallbackContext) -> None:
+    print("Successfully")
+
+        
         # Future-Forest, [5/10/2022 3:59 PM]
         # Hi Лёша Кирюшин!
 
@@ -554,6 +564,10 @@ def echo(update: Update, context: CallbackContext) -> None:
     elif get_sentence and not get_url and not get_weather and not get_qr:
         add_message(1)
 
+        user_data["main"] = "online"
+        user_data["get_sentence"] = False
+        saving_data_of_user(user, user_data)
+
         # перевод на English
         translator = Translator(from_lang="ru", to_lang="en")
         sentence = translator.translate(update.message.text)
@@ -638,10 +652,6 @@ def echo(update: Update, context: CallbackContext) -> None:
             update.message.reply_text("Warning in Wiki ⚠\nPlease, write /error") 
             print(_Ex)
 
-        user_data["main"] = "online"
-        user_data["get_sentence"] = False
-        saving_data_of_user(user, user_data)
-
     elif get_qr and not get_weather and not get_url and not get_sentence:
         add_message(1)
 
@@ -709,7 +719,7 @@ def smile(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     add_online(user)
     
-    with open('Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
+    with open('Data-Bases-Tele/Data-Smiles.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
         all_smiles = data["all_smiles"]
 
@@ -723,7 +733,7 @@ def new_smile(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     add_online(user)
 
-    with open('Data-Bases/Data-Smiles.json', 'r', encoding='utf-8') as file:
+    with open('Data-Bases-Tele/Data-Smiles.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
         all_smiles = data["all_smiles"]
 
@@ -732,7 +742,7 @@ def new_smile(update: Update, context: CallbackContext) -> None:
 
     all_smiles.append(sticker_id)
 
-    with open('Data-Bases/Data-Smiles.json', 'w', encoding='utf-8') as file:
+    with open('Data-Bases-Tele/Data-Smiles.json', 'w', encoding='utf-8') as file:
         data = {
             "all_smiles": all_smiles
         }
@@ -850,7 +860,7 @@ def analyze_photo(update: Update, context: CallbackContext) -> None:
     # # сама фотография
     # update.message.reply_photo(str(photo_id))
 
-    with open('Data-Bases/Data-Photos.json', 'r', encoding='utf-8') as file:
+    with open('Data-Bases-Tele/Data-Photos.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
         all_photos = data["all_photos"]
 
@@ -860,7 +870,7 @@ def analyze_photo(update: Update, context: CallbackContext) -> None:
     all_photos.append(photo_id)
 
     # добавление в json-файл
-    with open('Data-Bases/Data-Photos.json', 'w', encoding='utf-8') as file:
+    with open('Data-Bases-Tele/Data-Photos.json', 'w', encoding='utf-8') as file:
         data = {
             "all_photos": all_photos
         }
