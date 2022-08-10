@@ -102,8 +102,12 @@ html {
   border-radius: 15px;
   margin-top: 60px;
   padding: 40px 70px;
-  
-  
+
+}
+
+.enter-form {
+  display: block;
+  background-color: red;
 }
 
 .btn-public {

@@ -30,14 +30,12 @@ from unittest import result
 from deepface import DeepFace
 import speedtest  
 import pyshorteners
-import wget
 import wikipedia
 import re
 import qrcode
 import numpy as np 
 import os
 import emoji
-from forex_python.converter import CurrencyRates
 from icrawler.builtin import GoogleImageCrawler
 import shutil
 from translate import Translator
@@ -47,9 +45,10 @@ open_weather_token = '4da9f58fdb818e1b9979d5c95b2f2aaf'
 tlgrm_tocken = "5366540233:AAEH04SZyyGE4uD7WvTHiRTXKxCvnQ-uqAM"
 google_search = "AIzaSyBzdzDll3gyr7867TsfI2FbIcuEzl_8crA"
 secret_key = '=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD, =EF=BF=BD=EF=BF=BD =EF=BF==BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF==BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =EF=BF=BD=EF==BF=BD =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF==BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD'
+host = 'l14key.pythonanywhere.com'
 
 def request_to_server(name_data):
-    url = f'http://127.0.0.1:5000/get/{name_data}/{secret_key}/'
+    url = f'http://{host}/get/{name_data}/{secret_key}/'
     
     response = requests.get(url).json()
 
@@ -69,7 +68,7 @@ def post_to_server(name_data, data_base):
         #             'Accept': 'text/plain'
         # }
         
-        url = f'http://127.0.0.1:5000/get/{name_data}/{secret_key}/'
+        url = f'http://{host}/get/{name_data}/{secret_key}/'
 
         response = requests.post(url, json=json.dumps(data))
 
@@ -302,7 +301,7 @@ def start(update: Update, context: CallbackContext) -> None:
             # with open("Data-Bases/Data-day.json", "r", encoding='utf-8') as file:
             #     data_day = json.load(file)
 
-            data_day = request_to_server("Data-day")
+            data_day = request_to_server("Data_Day")
 
             if f'{datetime.now().strftime("%m%d")}' not in data_day:
                 data_day[f'{datetime.now().strftime("%m%d")}'] = {}

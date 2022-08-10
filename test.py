@@ -599,4 +599,12 @@ def test_send_post_request():
 
     print(r.status_code)
 
+def yesterday_data():
+    data = int(datetime.now().strftime("%d"))-1
+
+    if data < 10:
+        data = '0' + str(data)
+    
+    return str(data)
+
 
