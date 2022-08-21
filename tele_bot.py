@@ -163,21 +163,51 @@ def add_message(amount):
         post_to_server("Data_Day", data_day)
 
         # В словарь AMOUNT
-        # with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
-            # data_day = json.load(file)["months"]
+        with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+            data_month = json.load(file)
+    
+            print(data_month)
 
-        request_to_server("Data_Amount")["months"]
-        print("Month", datetime.now().strftime("%m"))
-        print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+            data_month = data_month['months']
+
+            print(data_month)
+        # data_month = request_to_server("Data_Amount")
+
+        try:
+            month_num = datetime.now().strftime("%m")
+            # print("Month", month_num)
+            # print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+
+            data_month[f'{month_num}']["messages"] += 3
         
-        data_day[f'{datetime.now().strftime("%m")}']["messages"] += 3
+        except Exception as _Ex:
+            print("Exception", _Ex)
 
+            # Удаляем самый старый столбик
+            month_last = int(month_num) - 5
+
+            if month_last < 1:
+                month_last = 12 + month_last
+
+            print("m-last", month_last)
+
+            del data_month[f'0{month_last}']
+
+            # Создаем столбик для текущего месяца
+            data_month[f'{month_num}'] = {}
+            data_month[f'{month_num}']["intents"] = 0
+            data_month[f'{month_num}']["users"] = 0
+            data_month[f'{month_num}']["messages"] = 0
+
+            data_month[f'{month_num}']["messages"] += 3
+
+            print(data_month)
         # with open("Data-Bases/Data_Amount.json", "w", encoding='utf-8') as file:
-        data = {"months": data_day}
+        #     data = {"months": data_month}
             
-            # json.dump(data, file, sort_keys = True)
+        #     json.dump(data, file, sort_keys = True)
 
-        post_to_server("Data_Amount", data)
+        # post_to_server("Data_Amount", data)
 
         print("MESSAGE WAS ADDED")
 
@@ -319,7 +349,9 @@ def start(update: Update, context: CallbackContext) -> None:
             # В словарь AMOUNT
             # with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
             #     data_day = json.load(file)["months"]
-            request_to_server("Data_Amount")["months"]
+
+            request_to_server("Data_Amount")
+
             print("Month", datetime.now().strftime("%m"))
             print("Data", data_day[f'{datetime.now().strftime("%m")}'])
             
