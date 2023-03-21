@@ -7,13 +7,15 @@
 # : проверить работает ли бд)
 # Работа с текстом (озвучка)
 # Работа с голосовыми сообщениями
-# Админ и обычный 
+# Админ и обычный
 
-# Разделить базы данных на типы: будут хранится у сайта, 
+# Разделить базы данных на типы: будут хранится у сайта,
 #                           будут хранится у бота
 
 # Модуль
 import wiki_search
+
+# знаки предупреждений незначительны
 
 from random import *
 from time import *
@@ -24,16 +26,14 @@ import nltk
 import json
 import sklearn
 import requests
-from telegram import Update, ForceReply, KeyboardButton
+from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from unittest import result
-from deepface import DeepFace
-import speedtest  
+import speedtest
 import pyshorteners
 import wikipedia
 import re
 import qrcode
-import numpy as np 
+import numpy as np
 import os
 import emoji
 from icrawler.builtin import GoogleImageCrawler
@@ -49,16 +49,16 @@ host = 'l14key.pythonanywhere.com'
 
 def request_to_server(name_data):
     url = f'http://{host}/get/{name_data}/{secret_key}/'
-    
+
     response = requests.get(url).json()
 
-    print("RESPONSE",response)
+    # print("RESPONSE",response)
 
     return response
 
 def post_to_server(name_data, data_base):
     try:
-        print("DATA", data_base)
+        # print("DATA", data_base)
 
         data = {
             "json": data_base,
@@ -67,14 +67,14 @@ def post_to_server(name_data, data_base):
         # headers = {'Content-type': 'application/json',
         #             'Accept': 'text/plain'
         # }
-        
+
         url = f'http://{host}/get/{name_data}/{secret_key}/'
 
         response = requests.post(url, json=json.dumps(data))
 
-        print("JSON", (json.dumps(data)))
+        # print("JSON", (json.dumps(data)))
 
-        print("STATUS", response.status_code)
+        # print("STATUS", response.status_code)
 
     except Exception as _ex:
         print("Don't open",_ex)
@@ -94,27 +94,27 @@ def saving_data_of_user(user, data):
 
     except:
         print("НЕВОЗМОЖНО ОТКРЫТЬ!")
-    
-    print("G-W",data["get_weather"])
 
-    print("URL:", data["get_url"])
+    # print("G-W",data["get_weather"])
 
-    print("WAS_ONLINE", data["was_online"])
+    # print("URL:", data["get_url"])
 
-    print("User-data-MAIN", data["main"])
+    # print("WAS_ONLINE", data["was_online"])
 
-    print("GET_SENTENCE:", data["get_sentence"])
+    # print("User-data-MAIN", data["main"])
 
-    print("GET_QR:", data["get_qr"])
+    # print("GET_SENTENCE:", data["get_sentence"])
+
+    # print("GET_QR:", data["get_qr"])
 
     if data["main"] == "online":
         data_all_users["users"][str(user["id"])]["was_online"] = str(datetime.now().strftime("%H:%M"))
-    
-    data_all_users["users"][str(user["id"])]["main"] = data["main"]
-    
-    print("Main", user["id"], data["main"])
 
-    print("MAIN:", data_all_users["users"][str(user["id"])]["main"])
+    data_all_users["users"][str(user["id"])]["main"] = data["main"]
+
+    # print("Main", user["id"], data["main"])
+
+    # print("MAIN:", data_all_users["users"][str(user["id"])]["main"])
     data_all_users["users"][str(user["id"])]["rate_weather"] = data["rate_weather"]
     data_all_users["users"][str(user["id"])]["get_weather"] = data["get_weather"]
     data_all_users["users"][str(user["id"])]["get_url"] = data["get_url"]
@@ -124,23 +124,23 @@ def saving_data_of_user(user, data):
 
     try:
         # with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
-        
+
         data = {
                 "users": data_all_users["users"]
                 }
 
-        print("ALL OKEY")
+        # print("ALL OKEY")
 
         #     json.dump(data, file, sort_keys = True)
         post_to_server("Data_Users", data)
 
-        print("ALL OKEY 2")
+        # print("ALL OKEY 2")
 
     except Exception as _EX:
         print("НЕ ОТКРЫВАЕТСЯ HERE\n"+str(_EX))
 
 def add_message(amount):
-    print("ADD MESSAGE")
+    # print("ADD MESSAGE")
 
     # В словарь DAY
     try:
@@ -156,42 +156,51 @@ def add_message(amount):
             data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
 
         data_day[f'{datetime.now().strftime("%m%d")}']["messages"] += amount
-            
+
         # with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
         #     json.dump(data_day, file, sort_keys = True)
 
         post_to_server("Data_Day", data_day)
 
         # В словарь AMOUNT
-        with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
-            data_month = json.load(file)
-    
-            print(data_month)
+        # with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
+            # data_day = json.load(file)["months"]
 
-            data_month = data_month['months']
-
-            print(data_month)
-        # data_month = request_to_server("Data_Amount")
+        data_month = request_to_server("Data_Amount")
+        # print("Month", datetime.now().strftime("%m"))
+        # print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+        # print("BEFORE", data_month)
 
         try:
             month_num = datetime.now().strftime("%m")
-            # print("Month", month_num)
-            # print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+            print("Month", month_num)
+            # print("DATA", data_day)
+            print("Data", data_day[f'{datetime.now().strftime("%m%d")}'])
 
-            data_month[f'{month_num}']["messages"] += 3
-        
-        except Exception as _Ex:
-            print("Exception", _Ex)
+            data_month[f'{datetime.now().strftime("%m")}']["messages"] += 3
+        except:
+
+            print(data_month)
+            print(data_month[f'{datetime.now().strftime("%m")}'])
+            print(data_month[f'{datetime.now().strftime("%m")}']["messages"])
 
             # Удаляем самый старый столбик
-            month_last = int(month_num) - 5
+            if (int(month_num) > 5):
+                month_last = int(month_num) - 5
+            else:
+                month_last = int(month_num) +5
 
             if month_last < 1:
                 month_last = 12 + month_last
 
             print("m-last", month_last)
 
-            del data_month[f'0{month_last}']
+
+            if(month_last < 10) :
+                del data_month[f'0{month_last}']
+            else:
+                del data_month[f'{month_last}']
+
 
             # Создаем столбик для текущего месяца
             data_month[f'{month_num}'] = {}
@@ -201,19 +210,23 @@ def add_message(amount):
 
             data_month[f'{month_num}']["messages"] += 3
 
-            print(data_month)
+        # print("AFTER", data_month)
         # with open("Data-Bases/Data_Amount.json", "w", encoding='utf-8') as file:
-        #     data = {"months": data_month}
-            
-        #     json.dump(data, file, sort_keys = True)
+#
+        data = {
+            "months": data_month
+        }
 
-        # post_to_server("Data_Amount", data)
+            # json.dump(data, file, sort_keys = True)
+
+        post_to_server("Data_Amount", data)
 
         print("MESSAGE WAS ADDED")
 
 
     except Exception as _Ex:
         print("Warning in Add_Message\n", _Ex)
+
 
 def add_online(user):
     # Открытие словаря
@@ -235,16 +248,16 @@ def add_online(user):
 def get_password():
     # 8 символов
     all_passwords = list()
-    
+
     # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
         # data_all_users = json.load(file)
-    data_all_users = request_to_server("Data_Users")    
+    data_all_users = request_to_server("Data_Users")
     data_all_users = data_all_users["users"]
-        
+
     for user in data_all_users:
-        print(data_all_users[user]['password'])
+        # print(data_all_users[user]['password'])
         all_passwords.append(data_all_users[user]['password'])
-        
+
 
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(8))
@@ -252,8 +265,8 @@ def get_password():
     while password in all_passwords:
         alphabet = string.ascii_letters + string.digits
         password = ''.join(secrets.choice(alphabet) for i in range(8))
-    
-    print("PASSWORD", password)
+
+    # print("PASSWORD", password)
 
     return password
 
@@ -261,36 +274,36 @@ def get_password():
 def start(update: Update, context: CallbackContext) -> None:
     print("Successfully")
 
-        
+
         # Future-Forest, [5/10/2022 3:59 PM]
         # Hi Лёша Кирюшин!
 
         # Future-Forest, [5/10/2022 3:59 PM]
-        # [Лёша Кирюшин](tg://user?id=1010205515)\!  
+        # [Лёша Кирюшин](tg://user?id=1010205515)\!
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
         emoji.emojize(fr'Hi, {user.mention_markdown_v2()}\!:v:', language = 'alias'),
         reply_markup=ForceReply(selective=True),
-        
+
     )
-    # update.message.reply_text(fr'{user.mention_markdown_v2()}\!') 
+    # update.message.reply_text(fr'{user.mention_markdown_v2()}\!')
 
     # update.message.reply_text(str(user))
-    # {'last_name': 'Кирюшин', 'language_code': 'en', 
-    # 'is_bot': False, 'id': 1010205515, 
-    # 'username': 'l_keey', 
+    # {'last_name': 'Кирюшин', 'language_code': 'en',
+    # 'is_bot': False, 'id': 1010205515,
+    # 'username': 'l_keey',
     # 'first_name': 'Лёша'}
 
-    password = get_password() 
-    print("password", password)
+    password = get_password()
+    # print("password", password)
 
     # Данного пользователя
     data_user = {
-        'last_name': user["last_name"], 
-        'language_code': user["language_code"], 
-        'id': str(user["id"]), 
-        'username': user["username"], 
+        'last_name': user["last_name"],
+        'language_code': user["language_code"],
+        'id': str(user["id"]),
+        'username': user["username"],
         'first_name': user["first_name"],
         'password': password,
         'points': 0,
@@ -318,6 +331,8 @@ def start(update: Update, context: CallbackContext) -> None:
 
     # если не зареган
     if not (data_user["id"] in data_all_users):
+        # print("USER ISN'T REGISTER")
+
         data_all_users[data_user["id"]] = data_user
         try:
             # with open('Data-Bases/Data-users.json', 'w', encoding='utf-8') as file:
@@ -340,48 +355,45 @@ def start(update: Update, context: CallbackContext) -> None:
                 data_day[f'{datetime.now().strftime("%m%d")}']["messages"] = 0
 
             data_day[f'{datetime.now().strftime("%m%d")}']["users"] += 1
-                        
+
             # with open('Data-Bases/Data-day.json', 'w', encoding='utf-8') as file:
             #     json.dump(data_day, file, sort_keys = True)
-            
-            post_to_server("Data_Day", data_day) 
+
+            post_to_server("Data_Day", data_day)
 
             # В словарь AMOUNT
             # with open("Data-Bases/Data-Amount.json", "r", encoding='utf-8') as file:
             #     data_day = json.load(file)["months"]
-
-            request_to_server("Data_Amount")
-
-            print("Month", datetime.now().strftime("%m"))
-            print("Data", data_day[f'{datetime.now().strftime("%m")}'])
-            
-            data_day[f'{datetime.now().strftime("%m")}']["users"] += 1
-
+            data_month = request_to_server("Data_Amount")
+            # print("Month", datetime.now().strftime("%m"))
+            # print("Data", data_day[f'{datetime.now().strftime("%m")}'])
+            # print("BEFORE", data_month)
+            data_month[f'{datetime.now().strftime("%m")}']["users"] += 1
+            # print("AFTER", data_month)
             # with open("Data-Bases/Data_Amount.json", "w", encoding='utf-8') as file:
-            data = {"months": data_day}
-                
+            data = {
+                "months": data_month
+            }
+
+            # print("DATA-AMOUNT", data)
                 # json.dump(data, file, sort_keys = True)
-            
+
             post_to_server("Data_Amount", data)
 
         except Exception as _Ex:
-            update.message.reply_text(emoji.emojize("Warning in open data-user :warning:\nPlease, write /error", language = 'alias' ))
+            update.message.reply_text(emoji.emojize("If there are any problems, :warning:\nPlease, write /error", language = 'alias' ))
             print("Warning", _Ex)
 
         update.message.reply_text(emoji.emojize("Вы были успешно зарегистрированы! :globe_with_meridians:", language = 'alias' ))
     else:
-        
+
         update.message.reply_text(emoji.emojize("С возвращением)\nВижу:eyes:, вы уже были здесь зарегистрированы!", language = 'alias'))
     # update.message.reply_text(str(len(data_all_users)))
         # Остальные сообщения
-    
-    
 
 
     # подписка к векторайзеру
 def get_intent_by_model(text, BOT_CONFIG):
-
-    
 
     corpus = []
     y = []
@@ -390,34 +402,38 @@ def get_intent_by_model(text, BOT_CONFIG):
             corpus.append(example)
             y.append(intent)
 
+    # Split arrays or matrices into random train and test subsets.
     corpus_train, corpus_test, y_train, y_test = sklearn.model_selection.train_test_split(corpus, y, test_size=0.2)
-    # векторайзер
+    
+    # Convert a collection of text documents to a matrix of token counts.
     # vectorizer = sklearn.feature_extraction.text.CountVectorizer(ngram_range=(2,4), analyzer='char_wb')
+    
+    # Convert a collection of raw documents to a matrix of TF-IDF features.
     vectorizer = sklearn.feature_extraction.text.TfidfVectorizer(ngram_range=(2, 4), analyzer='char_wb', use_idf=True)
     X_train = vectorizer.fit_transform(corpus_train)
     X_test = vectorizer.transform(corpus_test)
+
     clf = sklearn.linear_model.RidgeClassifier(copy_X=True, max_iter=200)
-    # clf = sklearn.ensemble.RandomForestClassifier()
     clf.fit(X_train, y_train)
     clf.score(X_test, y_test)
 
+    # Таким образом, параметры, полученные нашей моделью с использованием обучающих данных, помогут нам преобразовать наши тестовые данные.
     return clf.predict(vectorizer.transform([text]))[0]
 
-def bot(text):
-    # открытие словаря
+def bot(text, update):
+    
     try:
-        # with open("Data-Bases/Data_Base.json", "r", encoding="utf-8") as file: 
-        
         BOT_CONFIG = request_to_server("Data_Base")
-        print(BOT_CONFIG)
 
     except:
-        print("WARNING ⚠")
+        update.message.reply_text(
+            emoji.emojize("Warning in open BASE-DATA" +
+        ":warning:\nPlease, write /error", language = 'alias' ))
 
     intent = get_intent_by_model(text, BOT_CONFIG)
-        
+
     return BOT_CONFIG['intents'][intent]['responses']
-    
+
 
 def echo(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
@@ -428,49 +444,49 @@ def echo(update: Update, context: CallbackContext) -> None:
         #     data_all_users = json.load(file)
         data_all_users = request_to_server("Data_Users")
 
-        print("1 step")
+        # print("1 step")
 
         user_data = data_all_users["users"]
 
-        print("2 step")
+        # print("2 step")
 
         user_data = user_data[str(user["id"])]
 
-        print("I've data")
+        # print("I've data")
 
     except:
         update.message.reply_text(emoji.emojize("Warninng in GET-DATA 1 :warning:\nPlease, write /error", language = 'alias' ))
 
-    lang = user_data["language_code"] 
-    print("LANG:", lang)
+    lang = user_data["language_code"]
+    # print("LANG:", lang)
 
     id = user_data["id"]
-    print("ID:", id)
+    # print("ID:", id)
 
-    get_weather = user_data["get_weather"] 
-    print("GET_WEATHER:",get_weather)
+    get_weather = user_data["get_weather"]
+    # print("GET_WEATHER:",get_weather)
 
-    get_url = user_data["get_url"] 
-    print("GET_URL:", get_url)
+    get_url = user_data["get_url"]
+    # print("GET_URL:", get_url)
 
-    get_sentence = user_data["get_sentence"] 
-    print("GET_SENTENCE:", get_sentence)
+    get_sentence = user_data["get_sentence"]
+    # print("GET_SENTENCE:", get_sentence)
 
-    get_qr = user_data["get_qr"] 
-    print("GET_QR:", get_qr)
+    get_qr = user_data["get_qr"]
+    # print("GET_QR:", get_qr)
 
-    print(1, not get_weather and not get_url and not get_sentence and not get_qr)
-    print(2, get_weather and not get_url and not get_sentence and not get_qr)
-    print(3, get_url and not get_weather and not get_sentence and not get_qr)
-    print(4, get_sentence and not get_url and not get_weather and not get_qr)
-    print(5, get_qr and not get_weather and not get_url and not get_sentence)
+    # print(1, not get_weather and not get_url and not get_sentence and not get_qr)
+    # print(2, get_weather and not get_url and not get_sentence and not get_qr)
+    # print(3, get_url and not get_weather and not get_sentence and not get_qr)
+    # print(4, get_sentence and not get_url and not get_weather and not get_qr)
+    # print(5, get_qr and not get_weather and not get_url and not get_sentence)
 
     """Echo the user message."""
     if not get_weather and not get_url and not get_sentence and not get_qr:
         add_message(1)
 
         input_text = update.message.text
-        reply = bot(input_text)
+        reply = bot(input_text, Update)
         update.message.reply_text(reply)
 
         user_data["main"] = "online"
@@ -479,18 +495,18 @@ def echo(update: Update, context: CallbackContext) -> None:
     elif get_weather and not get_url and not get_sentence and not get_qr:
         add_message(1)
 
-        rate_weather = user_data["rate_weather"] 
-        print("rate_weather", rate_weather)
+        rate_weather = user_data["rate_weather"]
+        # print("rate_weather", rate_weather)
 
         if rate_weather == 1:
             city = update.message.text
-            
+
             # Данного пользователя
             # data_user = {
-            #     'last_name': user_data["first_name"], 
-            #     'language_code': user_data["language_code"], 
-            #     'id': str(user_data["id"]), 
-            #     'username': user_data["username"], 
+            #     'last_name': user_data["first_name"],
+            #     'language_code': user_data["language_code"],
+            #     'id': str(user_data["id"]),
+            #     'username': user_data["username"],
             #     'first_name': user_data["first_name"],
             #     'password': str(user_data["password"]),
             #     'points': str(user_data["points"]),
@@ -508,16 +524,16 @@ def echo(update: Update, context: CallbackContext) -> None:
             user_data["get_weather"] = False
 
             saving_data_of_user(user, user_data)
-            
+
             try:
                 data = requests.get((
                     f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric'
                 )).json()
 
                 # {"coord": {"lon": 37.6156, "lat": 55.7522}, "weather": [{"id": 804, "main": "Clouds", "description": "overcast clouds",
-                #  "icon": "04d"}], "base": "stations", "main": {"temp": 9.57, "feels_like": 6.72, "temp_min": 5.75, "temp_max": 10.35, 
+                #  "icon": "04d"}], "base": "stations", "main": {"temp": 9.57, "feels_like": 6.72, "temp_min": 5.75, "temp_max": 10.35,
                 #  "pressure": 1020, "humidity": 34, "sea_level": 1020, "grnd_level": 1002}, "visibility": 10000, "wind": {"speed": 5.94,
-                #   "deg": 335, "gust": 6.75}, "clouds": {"all": 95}, "dt": 1652091338, "sys": {"type": 1, "id": 9027, "country": "RU", 
+                #   "deg": 335, "gust": 6.75}, "clouds": {"all": 95}, "dt": 1652091338, "sys": {"type": 1, "id": 9027, "country": "RU",
                 #   "sunrise": 1652059798, "sunset": 1652116922}, "timezone": 10800, "id": 524901, "name": "Moscow", "cod": 200}
 
                 city = data['name']
@@ -533,8 +549,8 @@ def echo(update: Update, context: CallbackContext) -> None:
                 sunset_timestamp = datetime.fromtimestamp(data['sys']['sunset'])
                 # length_of_day = datetime.fromtimestamp(data['sys']['sunset']) - datetime.datetime.fromtimestamp(data['sys']['sunrise'])
                 length_of_day = sunset_timestamp - sunrise_timestamp
-                
-                
+
+
                 # EMOJIZE
                     # Temperature
                 if int(cur_weather) >= 15:
@@ -554,16 +570,16 @@ def echo(update: Update, context: CallbackContext) -> None:
 
                     # Visibility
                 emoji_visibility = ":foggy:"
-                
+
                 update.message.reply_text(emoji.emojize('***'+str(datetime.now().strftime('%Y-%m-%d :watch: %H:%M'))+'***', language = 'alias'))
                 update.message.reply_text(emoji.emojize(f'Погода в городе: '+str(city)+', '+str(country)+' :house_with_garden:\nТемпература: '+str(cur_weather)+f"°C {emoji_weather}\nСкорость ветра: "+str(wind)+'м\с :dash:', language = 'alias'))
                 update.message.reply_text(emoji.emojize(f"Описание: "+str(description)+f' {emoji_description}\nВидимость: '+str(visibility)+f' {emoji_visibility}\nВлажность: '+str(humidity)+' :droplet:', language = 'alias'))
                 update.message.reply_text(emoji.emojize('Восход солнца: '+str(sunrise_timestamp)+' :sunrise:\nЗакат солнца: '+str(sunset_timestamp)+' :city_sunset:\nПродолжительность дня: '+str(length_of_day)+' :hourglass:', language = 'alias'))
-                update.message.reply_text(emoji.emojize('Одевайся по погоде!) :necktie:',language = 'alias'))              
+                update.message.reply_text(emoji.emojize('Одевайся по погоде!) :necktie:',language = 'alias'))
 
             except Exception as ex:
                 update.message.reply_text("Warning in GET_WEATHER ⚠\nPlease, write /error")
-                update.message.reply_text(data)   
+                update.message.reply_text(data)
                 update.message.reply_text(str(ex))
 
     elif get_url and not get_weather and not get_sentence and not get_qr:
@@ -581,17 +597,17 @@ def echo(update: Update, context: CallbackContext) -> None:
             user_data["get_url"] = False
             saving_data_of_user(user, user_data)
 
-        except Exception as ex:    
-                
+        except Exception as ex:
+
             update.message.reply_text("Warning in PRETTY URL ⚠\nPlease, write /error")
             update.message.reply_text(str(ex))
 
-        # get_weather = user_data["get_weather"] 
+        # get_weather = user_data["get_weather"]
         # print("GET_WEATHER:",get_weather)
 
-        # get_url = user_data["get_url"] 
+        # get_url = user_data["get_url"]
         # print("GET_URL:", get_url)
-    
+
     elif get_sentence and not get_url and not get_weather and not get_qr:
         add_message(1)
 
@@ -602,23 +618,23 @@ def echo(update: Update, context: CallbackContext) -> None:
         # перевод на English
         translator = Translator(from_lang="ru", to_lang="en")
         sentence = translator.translate(update.message.text)
-        
-        print('Result on EN:', sentence)
- 
-        update.message.reply_text("Выполняю поиск по Wikipedia 🔎\nПожалуйста, подождите...") 
- 
+
+        # print('Result on EN:', sentence)
+
+        update.message.reply_text("Выполняю поиск по Wikipedia 🔎\nПожалуйста, подождите...")
+
         # try:
         #     page = wikipedia.page(sentence)
-           
+
         # except wikipedia.DisambiguationError as e:
         #     chosen = choice(e.options)
         #     page = wikipedia.page(chosen)
-        #     update.message.reply_text("Слишком много страниц...\nРасскажу о "+str(page)) 
+        #     update.message.reply_text("Слишком много страниц...\nРасскажу о "+str(page))
 
-          
-        print(lang)
+
+        # print(lang)
         page = wiki_search.searching(sentence, lang)
-        print(page)
+        # print(page)
         while True:
             try:
                 request = wikipedia.summary(page, sentences=1)
@@ -627,18 +643,18 @@ def echo(update: Update, context: CallbackContext) -> None:
                 chosen = choice(e.options)
                 page = wikipedia.page(chosen)
 
-        request=re.sub('\([^()]*\)', '', request) 
-        request=re.sub('\([^()]*\)', '', request) 
+        request=re.sub('\([^()]*\)', '', request)
+        request=re.sub('\([^()]*\)', '', request)
         request=re.sub('\{[^\{\}]*\}', '', request)
 
-        
-        update.message.reply_text(request) 
+
+        update.message.reply_text(request)
         try:
             # выбор файла
             # if len(wikipedia.page(request).images) >= 0:
             #     for i in range(len(wikipedia.page(request).images)):
             #         url = wikipedia.page(request).images[i]
-                    
+
             #         if "png" in url:
             #             filename = f"wiki{id}.png"
             #             wget.download(url, filename)
@@ -663,11 +679,11 @@ def echo(update: Update, context: CallbackContext) -> None:
 
             # Записываем в папку
             crawler = GoogleImageCrawler(storage={'root_dir': f'./img_by_{id}'})
-            
+
             # из запроса page вырезаем "wikipedia"
-            print("REQUEST IS", str(page)[16:(len((str(page)))-2)])
+            # print("REQUEST IS", str(page)[16:(len((str(page)))-2)])
             crawler.crawl(keyword=str(page)[16:(len((str(page)))-2)], max_num=5, filters=filters)
-            
+
             # Отправляем кадый файл папки
             for filename in os.listdir(f'./img_by_{id}'):
 
@@ -680,7 +696,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 
 
         except Exception as _Ex:
-            update.message.reply_text("Warning in Wiki ⚠\nPlease, write /error") 
+            update.message.reply_text("Warning in Wiki ⚠\nPlease, write /error")
             print(_Ex)
 
     elif get_qr and not get_weather and not get_url and not get_sentence:
@@ -696,11 +712,11 @@ def echo(update: Update, context: CallbackContext) -> None:
             # компилируем данные в массив QR-кода
             qr.make()
             # распечатать форму изображения
-            print("The shape of the QR image:", np.array(qr.get_matrix()).shape)
+            # print("The shape of the QR image:", np.array(qr.get_matrix()).shape)
             # переносим массив в реальное изображение
             img = qr.make_image(fill_color="#eca1a6", back_color="black")
             # сохраняем в файл
-            img.save(filename) 
+            img.save(filename)
 
             with open(filename, "rb") as file:
                 update.message.reply_photo(file)
@@ -716,7 +732,7 @@ def echo(update: Update, context: CallbackContext) -> None:
         except Exception as _Ex:
             update.message.reply_text("Warning in QR ⚠\nPlease, write /error")
             update.message.reply_text(str(_Ex))
-       
+
 def weather(update: Update, context: CallbackContext) -> None:
     add_message(3)
 
@@ -730,7 +746,7 @@ def weather(update: Update, context: CallbackContext) -> None:
         user_data = data_all_users["users"]
         user_data = user_data[str(user["id"])]
 
-        print("I've data")
+        # print("I've data")
 
     except Exception as _Ex:
         update.message.reply_text("Warninng in GET-DATA 2 ⚠\nPlease, write /error")
@@ -741,7 +757,7 @@ def weather(update: Update, context: CallbackContext) -> None:
     user_data["main"] = "online"
 
     saving_data_of_user(user, user_data)
-    
+
     update.message.reply_text(emoji.emojize("Введите город: :house:",language = 'alias'))
 
 def smile(update: Update, context: CallbackContext) -> None:
@@ -749,7 +765,7 @@ def smile(update: Update, context: CallbackContext) -> None:
 
     user = update.effective_user
     add_online(user)
-    
+
     with open('Data-Bases-Tele/Data-Smiles.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
         all_smiles = data["all_smiles"]
@@ -769,7 +785,7 @@ def new_smile(update: Update, context: CallbackContext) -> None:
         all_smiles = data["all_smiles"]
 
     sticker_id = update.message.sticker.file_id
-    
+
 
     all_smiles.append(sticker_id)
 
@@ -786,7 +802,7 @@ def print_bio(update: Update, context: CallbackContext) -> None:
 
     user = update.effective_user
     add_online(user)
-    
+
     try:
         # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
         #     data_all_users = json.load(file)
@@ -809,14 +825,14 @@ def print_bio(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(emoji.emojize("*Был зарегистрирован:* "+str(user_data["registered"])+" ⓡ", language = 'alias'), parse_mode='MarkdownV2')
     update.message.reply_text(emoji.emojize("*Roots:* "+str(user_data["points"])+" :deciduous_tree:", language = 'alias'), parse_mode='MarkdownV2')
 
-    update.message.reply_text(emoji.emojize("Чтобы заработать Intent-ы переходи сюда:(url...) :link:", language = 'alias'))
-    
+    update.message.reply_text(emoji.emojize(f"Чтобы заработать Intent-ы переходи сюда:http://l14key.pythonanywhere.com/{user_data['id']} :link:", language = 'alias'))
+
 def print_statistics(update: Update, context: CallbackContext) -> None:
     add_message(3)
 
     user = update.effective_user
     add_online(user)
-    
+
     try:
         # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
         #     data_all_users = json.load(file)
@@ -825,8 +841,8 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
         user_data = users_data[str(user["id"])]
 
     except Exception as ex:
-        update.message.reply_text(str(ex)) 
-        update.message.reply_text("Warninng in Statistics ⚠\nPlease, write /error") 
+        update.message.reply_text(str(ex))
+        update.message.reply_text("Warninng in Statistics ⚠\nPlease, write /error")
 
     counter_online = 0
     admin_counter = 0
@@ -839,43 +855,59 @@ def print_statistics(update: Update, context: CallbackContext) -> None:
 
         user_time = datetime.strptime(users_data[user_for]["was_online"], '%H:%M')
 
-        now_time = datetime.strptime(str(datetime.now().strftime("%H:%M")), '%H:%M') 
+        now_time = datetime.strptime(str(datetime.now().strftime("%H:%M")), '%H:%M')
 
         if users_data[user_for]["main"] == "online":
-            
+
             # Если не совершал никаих действий более 15 минут
             # not user_time + fifteen_minutes <= now_time and not user_time + fifteen_minutes >= now_time:
-                
+
             # Онлайн
             if user_time + fifteen_minutes >= now_time:
                 if user_time - fifteen_minutes <= now_time:
-                    print("User_time:", user_time+fifteen_minutes)
-                    print("Now:", now_time)
-                    print(users_data[user_for]["main"] == "online")
+                    # print("User_time:", user_time+fifteen_minutes)
+                    # print("Now:", now_time)
+                    # print(users_data[user_for]["main"] == "online")
                     counter_online += 1
 
             # OFFLINE
             else:
                 user_data["main"] = "off-line"
-               
-                print(users_data[user_for])
+
+                # print(users_data[user_for])
 
                 saving_data_of_user(users_data[user_for], user_data)
- 
+
         if users_data[user_for]["post"] == "Admin":
             admin_counter += 1
 
-        print(1, user_time + fifteen_minutes <= now_time)
-        print(2, user_time + fifteen_minutes >= now_time)
-        
-        print("User_time:", user_time+fifteen_minutes)
-        print("Now:", now_time)
+        # print(1, user_time + fifteen_minutes <= now_time)
+        # print(2, user_time + fifteen_minutes >= now_time)
+
+        # print("User_time:", user_time+fifteen_minutes)
+        # print("Now:", now_time)
 
     update.message.reply_text(emoji.emojize("*Online:* "+str(counter_online)+" :iphone:", language = 'alias'), parse_mode='MarkdownV2')
     update.message.reply_text(emoji.emojize("*Admins:* "+str(admin_counter)+ "👨‍💻", language = 'alias'), parse_mode='MarkdownV2')
 
+    try:
+        amount_users = 0
+
+        # with open('Data-Bases/Data-users.json', 'r', encoding='utf-8') as file:
+        #     data_all_users = json.load(file)
+        data_amount = request_to_server("Data_Amount")
+
+        for month in data_amount:
+            amount_users += data_amount[month]["users"]
+
+    except Exception as ex:
+        update.message.reply_text(str(ex))
+        update.message.reply_text("Warninng in Statistics ⚠\nPlease, write /error")
+
+
+
     # Добавить спрятанный текст
-    update.message.reply_text(emoji.emojize("Общее количество пользователей, зарегистрированных в Future Forest: "+str(len(users_data))+" :busts_in_silhouette:", language = 'alias'))
+    update.message.reply_text(emoji.emojize("Общее количество пользователей, зарегистрированных в Future Forest: "+str(amount_users)+" :busts_in_silhouette:", language = 'alias'))
 
 # Обработка фотографий
 def analyze_photo(update: Update, context: CallbackContext) -> None:
@@ -883,9 +915,9 @@ def analyze_photo(update: Update, context: CallbackContext) -> None:
 
     user = update.effective_user
     add_online(user)
-    
+
     update.message.reply_text("Photo was saved")
-    
+
     # # текст айди
     # update.message.reply_text(str(photo_id))
     # # сама фотография
@@ -906,7 +938,7 @@ def analyze_photo(update: Update, context: CallbackContext) -> None:
             "all_photos": all_photos
         }
         json.dump(data, file, sort_keys = True)
-   
+
     # try:
     #     file_info = dispatcher.get_file(photo_id)
     #     downloaded_file = dispatcher.download_file(file_info.file_path)
@@ -919,7 +951,7 @@ def analyze_photo(update: Update, context: CallbackContext) -> None:
 
     #     result_dict = DeepFace.analyze(photo_id, actions=["age", "gender", "race", "emotion"])
     #     print(result_dict)
-        
+
 
     # except Exception as _Ex:
     #     update.message.reply_text(str(_Ex))
@@ -930,9 +962,9 @@ def ethernet_check(update: Update, context: CallbackContext) -> None:
 
     user = update.effective_user
     add_online(user)
-    
+
     try:
-        st = speedtest.Speedtest() 
+        st = speedtest.Speedtest()
 
         update.message.reply_text(emoji.emojize("Немного подождите...\nВыполняется проверка интернета :hourglass_flowing_sand:", language = 'alias'))
 
@@ -941,10 +973,10 @@ def ethernet_check(update: Update, context: CallbackContext) -> None:
         #  Загрузка
         update.message.reply_text("Скорость загрузки: ⤴\n"+str(st.upload())+" Mbit/s")
         #  Пинг
-        servernames =[]   
-        st.get_servers(servernames)       
+        servernames =[]
+        st.get_servers(servernames)
         update.message.reply_text("Пинг: 🌐\n"+str(st.results.ping)+" ms")
-    
+
     except Exception as _Ex:
 
         update.message.reply_text("Warning in ETHERNET-CHECK ⚠\nPlease, write /error")
@@ -1029,12 +1061,12 @@ def print_info(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     add_online(user)
     add_message(3)
-    
+
     # What can this bot do?
 
 
     string = '''· Возможность общения с чат-ботом 💬\n
-· Получение погоды в любом городе ⛅\n 
+· Получение погоды в любом городе ⛅\n
 · Отправка рандомного стикера, а также его сохранение в базу данных 📝\n
 · Добавление пользователя в базу данных и показ его статистики и данных 🔐\n
 · Статистика всех зарегистрированных пользователей 👥\n
@@ -1058,27 +1090,27 @@ def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Телеграмм токен
-    updater = Updater(tlgrm_tocken)  
+    updater = Updater(tlgrm_tocken)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 # СЛЕШОВЫЕ команды
-  
+
     # on different commands - answer in Telegram
 
                 #со смайлами (+)
-    dispatcher.add_handler(CommandHandler("start", start)) # + 
-    dispatcher.add_handler(CommandHandler("weather", weather)) # + 
+    dispatcher.add_handler(CommandHandler("start", start)) # +
+    dispatcher.add_handler(CommandHandler("weather", weather)) # +
     dispatcher.add_handler(CommandHandler("smile", smile)) # +
     dispatcher.add_handler(CommandHandler("bio", print_bio)) # +
-    dispatcher.add_handler(CommandHandler("statistics", print_statistics)) # +    
-    dispatcher.add_handler(CommandHandler("url", cute_url)) # + 
-    dispatcher.add_handler(CommandHandler("ethernet", ethernet_check)) # +    
-    dispatcher.add_handler(CommandHandler("wiki", search_wiki))    
-    dispatcher.add_handler(CommandHandler("qr", qr_code))    
-    dispatcher.add_handler(CommandHandler("error", print_error))    
-    dispatcher.add_handler(CommandHandler("info", print_info))    
-  
+    dispatcher.add_handler(CommandHandler("statistics", print_statistics)) # +
+    dispatcher.add_handler(CommandHandler("url", cute_url)) # +
+    dispatcher.add_handler(CommandHandler("ethernet", ethernet_check)) # +
+    dispatcher.add_handler(CommandHandler("wiki", search_wiki))
+    dispatcher.add_handler(CommandHandler("qr", qr_code))
+    dispatcher.add_handler(CommandHandler("error", print_error))
+    dispatcher.add_handler(CommandHandler("info", print_info))
+
     dispatcher.add_handler(MessageHandler(Filters.sticker, new_smile))
     dispatcher.add_handler(MessageHandler(Filters.photo, analyze_photo))
 

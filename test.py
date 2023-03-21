@@ -607,4 +607,14 @@ def yesterday_data():
     
     return str(data)
 
+def remove(): # любую фразу в json
+    weather = {
+            "Hi": "Мдаа, порой приходится посещать, весьма смутное заведение!",
+        
+        }
 
+    with open('data_base_hi.json', 'w', encoding='utf-8') as file:
+        json.dump(weather, file, sort_keys = True)
+        print(file)
+
+remove()
