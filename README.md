@@ -1,17 +1,15 @@
-# TeleProject
+# Future Forest
 
 [![CodeFactor](https://www.codefactor.io/repository/github/lkeey/teleproject/badge)](https://www.codefactor.io/repository/github/lkeey/teleproject)
 
-TeleProject is a chatbot linked to the site and trained by your intents
+Future Forest is a chatbot linked to the site and trained by your intents
 
 The idea is that everyone invests a small part and a huge model is obtained
 
 ## Project characteristics and tech-stack
 
-<img src="https://raw.githubusercontent.com/lkeey/EnglishApp/master/app/src/main/res/drawable/app_logo_large.png" width="336" align="right" hspace="20">
+<img src="https://raw.githubusercontent.com/lkeey/TeleProject/master/logo.png" width="350" align="right" hspace="20">
 
-* Storage of information
-  * JSON
 * Libraries
   * Bot API Library
   * Flask
@@ -21,6 +19,9 @@ The idea is that everyone invests a small part and a huge model is obtained
   * Wikipedia API - find articles
   * QR - make qr
   * Base64 - encryption
+
+* Storage of information
+  * JSON
 
 ## Release
 
